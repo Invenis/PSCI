@@ -29,7 +29,7 @@ function Invoke-RunxUnitTests {
 
     .DESCRIPTION
     Executes xUnit tests using xUnit console runner.
-    Returns 0 if all tests succeeded, positive values give a count of failed tests in the run, negative values indicate internal error.
+    Returns 0 if all tests succeeded, positive number indicates error.
 
     .PARAMETER xUnitRunnerPath
     Path to xUnit console runner executable. If not specified xUnit runners will be downloaded from Nuget.
@@ -46,14 +46,8 @@ function Invoke-RunxUnitTests {
     .PARAMETER DoNotRunTestsFrom
     Array of assemblies to exclude from running tests. Wildcards are allowed.
 
-    .PARAMETER NetFrameworkVersion
-    The version of .NEt runtime to be used in executing tests.
-
-    .PARAMETER ResultPath
-    Path to the xml file with tests results.
-
     .EXAMPLE
-    Invoke-RunxUnitTests -ProjectRoot 'Source' -ResultPath testResult.xml -RunTestsFrom '*.UnitTests.*','*.WebTests.*' -DoNotRunTestsFrom '*\obj\*', '*\Debug\*'
+    Invoke-RunxUnitTests -RunTestsFrom '*.UnitTests.*','*.WebTests.*' -DoNotRunTestsFrom '*\obj\*', '*\Debug\*'
 
     #>
     [CmdletBinding()]
