@@ -915,6 +915,7 @@
     <Compile Include="modules\build\readme.txt" />
     <Compile Include="modules\build\TestsRunners\Invoke-RunJasmineTests.ps1" />
     <Compile Include="modules\build\TestsRunners\Invoke-RunNUnitTests.ps1" />
+    <Compile Include="modules\build\TestsRunners\Invoke-RunxUnitTests.ps1" />
     <Compile Include="modules\deploy\BuiltinSteps\PSCIDirectory.ps1" />
     <Compile Include="modules\deploy\BuiltinSteps\PSCIEntityFrameworkMigratePackage.ps1" />
     <Compile Include="modules\deploy\BuiltinSteps\PSCIEventLogSource.ps1" />
