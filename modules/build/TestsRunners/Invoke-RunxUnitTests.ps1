@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 #>
 
-function Invoke-RunxUnitTests {
+function Invoke-RunXUnitTests {
     <#
     .SYNOPSIS
     A helper that runs xUnit unit tests.
@@ -31,10 +31,10 @@ function Invoke-RunxUnitTests {
     Executes xUnit tests using xUnit console runner.
     Returns 0 if all tests succeeded, positive number indicates error.
 
-    .PARAMETER xUnitRunnerPath
+    .PARAMETER XUnitRunnerPath
     Path to xUnit console runner executable. If not specified xUnit runners will be downloaded from Nuget.
 
-    .PARAMETER xUnitVersion
+    .PARAMETER XUnitVersion
     The version of xUnit.Runners nuget to use if no runner path is specified. Version 3 is not yet supported.
 
     .PARAMETER TestsDirectory
@@ -47,7 +47,7 @@ function Invoke-RunxUnitTests {
     Array of assemblies to exclude from running tests. Wildcards are allowed.
 
     .EXAMPLE
-    Invoke-RunxUnitTests -RunTestsFrom '*.UnitTests.*','*.WebTests.*' -DoNotRunTestsFrom '*\obj\*', '*\Debug\*'
+    Invoke-RunXUnitTests -RunTestsFrom '*.UnitTests.*','*.WebTests.*' -DoNotRunTestsFrom '*\obj\*', '*\Debug\*'
 
     #>
     [CmdletBinding()]
@@ -55,11 +55,11 @@ function Invoke-RunxUnitTests {
     param(
         [Parameter(Mandatory=$false)]
         [string]
-        $xUnitRunnerPath,
+        $XUnitRunnerPath,
         
         [Parameter(Mandatory=$false)]
         [string]
-        $xUnitVersion = '2.1.0',
+        $XUnitVersion = '2.1.0',
 
         [Parameter(Mandatory=$false)]
         [string]
@@ -78,21 +78,21 @@ function Invoke-RunxUnitTests {
 
     $configPaths = Get-ConfigurationPaths
 
-    if (!$xUnitRunnerPath) {
+    if (!$XUnitRunnerPath) {
         Write-Log -Info 'No xUnit runner specified. Trying to install xUnit runner from Nuget.'
 
         $nugetPackagesPath = $configPaths.DeployScriptsPath + '\packages'
-        $xUnitRunnerPath = "$nugetPackagesPath\xUnit.runner.console\tools\xunit.console.exe"
+        $XUnitRunnerPath = "$nugetPackagesPath\xunit.runner.console\tools\xunit.console.exe"
 
-        if (!(Test-Path -Path $xUnitRunnerPath) ) {
-            Install-NugetPackage -PackageId xUnit.runner.console -Version $xUnitVersion -OutputDirectory $nugetPackagesPath -ExcludeVersionInOutput
+        if (!(Test-Path -Path $XUnitRunnerPath) ) {
+            Install-NugetPackage -PackageId xUnit.runner.console -Version $XUnitVersion -OutputDirectory $nugetPackagesPath -ExcludeVersionInOutput
         }
     } else {
-        $xUnitRunnerPath = Resolve-PathRelativeToProjectRoot -Path $xUnitRunnerPath -CheckExistence:$false
+        $XUnitRunnerPath = Resolve-PathRelativeToProjectRoot -Path $XUnitRunnerPath -CheckExistence:$false
     }
 
-    if (!(Test-Path -Path $xUnitRunnerPath)) {
-        throw "Cannot find xUnit console runner exe file at '$xUnitRunnerPath'."
+    if (!(Test-Path -Path $XUnitRunnerPath)) {
+        throw "Cannot find xUnit console runner exe file at '$XUnitRunnerPath'."
     }
 
     $TestsDirectory = Resolve-PathRelativeToProjectRoot `
@@ -132,7 +132,7 @@ function Invoke-RunxUnitTests {
     [void]($runnerArgs.Append(" $assemblies"))
     $runnerArgsStr = $runnerArgs.ToString()
 
-    $exitCode = Start-ExternalProcess -Command $xUnitRunnerPath -ArgumentList $runnerArgsStr -CheckLastExitCode:$false -ReturnLastExitCode -CheckStdErr:$false
+    $exitCode = Start-ExternalProcess -Command $XUnitRunnerPath -ArgumentList $runnerArgsStr -CheckLastExitCode:$false -ReturnLastExitCode -CheckStdErr:$false
 
     Write-ProgressExternal -Message ''
 
