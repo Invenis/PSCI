@@ -46,6 +46,12 @@ function Invoke-RunXUnitTests {
     .PARAMETER DoNotRunTestsFrom
     Array of assemblies to exclude from running tests. Wildcards are allowed.
 
+    .PARAMETER ResultFormat
+    Format of the file with tests results (available options: xml, xmlv1, nunit, html).
+
+    .PARAMETER ResultPath
+    Path to the file with tests results.
+
     .EXAMPLE
     Invoke-RunXUnitTests -RunTestsFrom '*.UnitTests.*','*.WebTests.*' -DoNotRunTestsFrom '*\obj\*', '*\Debug\*'
 
@@ -71,7 +77,15 @@ function Invoke-RunXUnitTests {
 
         [Parameter(Mandatory=$false)]
         [string[]]
-        $DoNotRunTestsFrom
+        $DoNotRunTestsFrom,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $ResultFormat,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $ResultPath
     )
 
     Write-ProgressExternal -Message 'Running xUnit tests'
@@ -130,6 +144,12 @@ function Invoke-RunXUnitTests {
     }
 
     [void]($runnerArgs.Append(" $assemblies"))
+	
+    if ($ResultFormat) {
+        [void]($runnerArgs.Append(" -$ResultFormat "))
+        [void]($runnerArgs.Append((Add-QuotesToPaths -Paths $ResultPath)))
+    }
+
     $runnerArgsStr = $runnerArgs.ToString()
 
     $exitCode = Start-ExternalProcess -Command $XUnitRunnerPath -ArgumentList $runnerArgsStr -CheckLastExitCode:$false -ReturnLastExitCode -CheckStdErr:$false
