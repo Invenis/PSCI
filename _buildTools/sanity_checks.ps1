@@ -48,6 +48,9 @@ SOFTWARE.
 #>
 "@ -replace "`r`n", "`n" -replace "`n", [Environment]::NewLine
 
+# we additionally accept different years
+$licenseTexts = @($licenseText, ($licenseText -replace '2015', '2016'))
+
 $customSources = Get-ChildItem -Path "$PSScriptRoot\.." -File -Filter "*.ps*1" -Recurse | 
                  Select-Object -ExpandProperty FullName |
                  Where-Object { $_ -inotmatch '(_buildTools\\Pester|_buildtools\\ScriptCop|externalLibs\\|dsc\\ext|cIIS\\|PSHOrg|examples\\|OBJ_cServiceResource|cCertificate\\)' }
@@ -58,7 +61,14 @@ $tabsNotMatching = New-Object -TypeName System.Collections.ArrayList
 
 foreach ($file in $customSources) {
     $content = Get-Content -Path $file -ReadCount 0 | Out-String
-    if (!$content.StartsWith($licenseText)) { 
+    $licenseTextOk = $false
+    foreach ($acceptedLicenseText in $licenseTexts) { 
+        if ($content.StartsWith($acceptedLicenseText)) {
+            $licenseTextOk = $true
+            break
+        }
+    }
+    if (!$licenseTextOk) {
         [void]($licenseNotMatching.Add($file))
     }
     if ($content -match '\t') {
@@ -68,10 +78,10 @@ foreach ($file in $customSources) {
 
 $errMsg = @()
 if ($licenseNotMatching) {
-    $errMsg += 'There are {0} files without valid license header: {1}' -f $licenseNotMatching.Count, ($licenseNotMatching -join ', ')
+    $errMsg += 'There are {0} file(s) without valid license header - please use license header from any other file: {1}' -f $licenseNotMatching.Count, ($licenseNotMatching -join ', ')
 }
 if ($tabsNotMatching) {
-    $errMsg += 'There are {0} files with tabs: {1}' -f $tabsNotMatching.Count, ($tabsNotMatching -join ', ')
+    $errMsg += 'There are {0} file(s) with tabs - please convert all tabs to spaces: {1}' -f $tabsNotMatching.Count, ($tabsNotMatching -join ', ')
 }
 
 if ($errMsg) {
