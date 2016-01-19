@@ -144,7 +144,7 @@ function Invoke-RunXUnitTests {
     }
 
     [void]($runnerArgs.Append(" $assemblies"))
-	
+
     if ($ResultFormat) {
         [void]($runnerArgs.Append(" -$ResultFormat "))
         [void]($runnerArgs.Append((Add-QuotesToPaths -Paths $ResultPath)))
