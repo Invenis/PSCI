@@ -134,7 +134,7 @@ function Resolve-StepScriptBlock {
             $configData += ' } ); }'
 
             $automaticParameters.ConfigurationData = $configData
-            $automaticParameters.OutputPath = $stepMofDir
+            $automaticParameters.OutputPath = "`"$stepMofDir`""
         }
 
         $paramsToAdd = ''
