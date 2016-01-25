@@ -72,6 +72,13 @@ function Deploy-SSISIspac {
 
     .PARAMETER PackagePath
     Path to the package containing sql files. If not provided, $PackagePath = $PackagesPath\$PackageName, where $PackagesPath is taken from global variable.
+
+    .PARAMETER LiteralPackagesParameters
+    SSIS parameters to override in specific packages in following format (only parameters literaly supplied):
+    @{ 'mypackage.dtsx' = @{
+            'DM.mypackageConnectionName.ConnectionString' = 'ServerConnectionString'
+    }}
+    Values can be tokenized if $Tokens is supplied.
    
     .EXAMPLE
     Deploy-SSISIspac -PackageName 'MySSIS' -ConnectionString $connectionString -Folder 'MyFolder'
@@ -118,7 +125,11 @@ function Deploy-SSISIspac {
 
         [Parameter(Mandatory=$false)]
         [string] 
-        $PackagePath
+        $PackagePath,
+
+        [Parameter(Mandatory=$false)]
+        [hashtable]
+        $LiteralPackagesParameters
 
     )
 
@@ -236,6 +247,28 @@ function Deploy-SSISIspac {
                        $paramValue = Resolve-Token -Name $paramName -Value $paramValue -ResolvedTokens $Tokens
                     }
                     $ssisPackage.Parameters[$paramName].Set('Referenced', $paramValue)
+                }
+                $ssisPackage.Alter()
+            }
+        }
+        if ($LiteralPackagesParameters) {
+            foreach ($packageName in $LiteralPackagesParameters.Keys) {
+                $paramValues = $LiteralPackagesParameters[$packageName]
+                Write-Log -Info "Setting following parameters on package '$packageName': $($paramValues.Keys -join ', ')."
+                $ssisPackage = $ssisProject.Packages.Item($packageName)
+                if (!$ssisPackage) {
+                    throw "SSIS package '$packageName' has not been found under project '$projectName'."
+                }
+                foreach ($paramName in $paramValues.Keys) {
+                    $ssisParameter = $ssisPackage.Parameters[$paramName]
+                    if (!$ssisParameter) {
+                        throw "Parameter named '$paramName' has not been found in SSIS package '$packageName' (project '$projectName')"
+                    }
+                    $paramValue = $paramValues[$paramName]
+                    if ($Tokens) { 
+                       $paramValue = Resolve-Token -Name $paramName -Value $paramValue -ResolvedTokens $Tokens
+                    }
+                    $ssisPackage.Parameters[$paramName].Set('Literal', $paramValue)
                 }
                 $ssisPackage.Alter()
             }
