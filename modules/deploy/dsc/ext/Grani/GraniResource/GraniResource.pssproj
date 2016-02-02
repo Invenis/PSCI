@@ -29,6 +29,8 @@
   <ItemGroup>
     <Folder Include="DSCResources\" />
     <Folder Include="DSCResources\cWebPILauncher\" />
+    <Folder Include="DSCResources\Grani_HostsFile\" />
+    <Folder Include="DSCResources\Grani_InheritACL\" />
     <Folder Include="DSCResources\Grani_ACL\" />
     <Folder Include="DSCResources\Grani_DomainJoin\" />
     <Folder Include="DSCResources\Grani_PendingReboot\" />
@@ -42,11 +44,16 @@
     <Folder Include="DSCResources\Grani_SymbolicLink\" />
     <Folder Include="DSCResources\Grani_TCPAckFrequency\" />
     <Folder Include="DSCResources\Grani_TopShelf\" />
+    <Folder Include="DSCResources\Grani_DotNetFramework\" />
     <Folder Include="DSCResources\Grani_WebPI\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DSCResources\cWebPILauncher\cWebPILauncher.psd1" />
     <Compile Include="DSCResources\cWebPILauncher\cWebPILauncher.schema.psm1" />
+    <Compile Include="DSCResources\Grani_DotNetFramework\Grani_DotNetFramework.psm1" />
+    <Compile Include="DSCResources\Grani_HostsFile\Grani_HostsFile.psm1" />
+    <Compile Include="DSCResources\Grani_HostsFile\Grani_HostsFile.schema.mof" />
+    <Compile Include="DSCResources\Grani_InheritACL\Grani_InheritACL.psm1" />
     <Compile Include="DSCResources\Grani_ACL\Grani_ACL.psm1" />
     <Compile Include="DSCResources\Grani_ACL\Grani_ACL.schema.mof" />
     <Compile Include="DSCResources\Grani_Download\Grani_Download.psm1" />
@@ -56,7 +63,6 @@
     <Compile Include="DSCResources\Grani_RegistryKey\Grani_RegistryKey.psm1" />
     <Compile Include="DSCResources\Grani_ScheduleTaskLog\Grani_ScheduleTaskLog.psm1" />
     <Compile Include="DSCResources\Grani_ScheduleTaskLog\Grani_ScheduleTaskLog.schema.mof" />
-    <Compile Include="DSCResources\Grani_ScheduleTask\Grani_ScheduleTask.schema.mof" />
     <Compile Include="DSCResources\Grani_TCPAckFrequency\Grani_TCPAckFrequency.psm1" />
     <Compile Include="DSCResources\Grani_TCPAckFrequency\Grani_TCPAckFrequency.schema.mof" />
     <Compile Include="DSCResources\Grani_TopShelf\cTopShelf.png" />
@@ -69,12 +75,22 @@
   <ItemGroup>
     <Content Include="DSCResources\cWebPILauncher\cWebPILauncher.md" />
     <Content Include="DSCResources\cWebPILauncher\cWebPILauncher.png" />
+    <Content Include="DSCResources\Grani_DotNetFramework\Grani_DotNetFramework.schema.mof" />
+    <Content Include="DSCResources\Grani_DotNetFramework\README.md" />
+    <Content Include="DSCResources\Grani_DotNetFramework\cDotNetFramework.png" />
+    <Content Include="DSCResources\Grani_HostsFile\README.md" />
+    <Content Include="DSCResources\Grani_HostsFile\cHostsFile.png" />
+    <Content Include="DSCResources\Grani_InheritACL\cInheritACLProtectedPreserve.png" />
+    <Content Include="DSCResources\Grani_InheritACL\cInheritACLProtectedNoPreserve.png" />
+    <Content Include="DSCResources\Grani_InheritACL\Grani_InheritACL.schema.mof" />
+    <Content Include="DSCResources\Grani_InheritACL\README.md" />
     <Content Include="DSCResources\Grani_ACL\README.md" />
     <Content Include="DSCResources\Grani_ACL\cACL.png" />
     <Content Include="DSCResources\Grani_DomainJoin\Grani_DomainJoin.psm1" />
     <Content Include="DSCResources\Grani_DomainJoin\Grani_DomainJoin.schema.mof" />
     <Content Include="DSCResources\Grani_DomainJoin\README.md" />
     <Content Include="DSCResources\Grani_DomainJoin\cDomainJoin.png" />
+    <Content Include="DSCResources\Grani_InheritACL\cInheritACL.png" />
     <Content Include="DSCResources\Grani_PendingReboot\README.md" />
     <Content Include="DSCResources\Grani_PendingReboot\cPendingReboot.png" />
     <Content Include="DSCResources\Grani_PfxImport\Grani_PfxImport.psm1" />
@@ -97,6 +113,7 @@
     <Content Include="DSCResources\Grani_ScheduleTaskLog\README.md" />
     <Content Include="DSCResources\Grani_ScheduleTaskLog\cScheduleTaskLog.png" />
     <Content Include="DSCResources\Grani_ScheduleTask\Grani_ScheduleTask.psm1" />
+    <Content Include="DSCResources\Grani_ScheduleTask\Grani_ScheduleTask.schema.mof" />
     <Content Include="DSCResources\Grani_ScheduleTask\README.md" />
     <Content Include="DSCResources\Grani_ScheduleTask\cScheduleTask.png" />
     <Content Include="DSCResources\Grani_SymbolicLink\Grani_SymbolicLink.psm1" />

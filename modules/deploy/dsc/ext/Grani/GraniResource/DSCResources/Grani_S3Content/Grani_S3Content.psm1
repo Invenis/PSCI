@@ -62,15 +62,17 @@ $verboseMessage = DATA {
     ConvertFrom-StringData -StringData "
         AlreadyUpToDate = Current DestinationPath FileHash and S3 FileHash matched. File already Up-To-Date.
         NotUpToDate = Current DestinationPath FileHash and S3 FileHash not matched. Need to download latest file.
+        ResultS3Bucket = S3Bucket exist status : S3Bucket {0}, Status : {1}
+        ResultS3Object = S3Object exist status : S3Object {0}, Status : {1}
         StartS3Download = Downloading S3 Object.
     "
 }
 $exceptionMessage = DATA {
     ConvertFrom-StringData -StringData "
         DestinationPathAlreadyExistAsNotFile = Destination Path '{0}' already exist but not a file. Found itemType is {1}. Windows not allowed exist same name item.
-        S3BucketNotExistEXception = Desired S3 Bucket not found exception. : '{0}'
-        S3ObjectNotExistEXception = Desired S3 Object not found in S3Bucket exception. : '{0}'
-        ScriptBlockException = Error thrown on ScriptBlock '{0}'
+        S3BucketNotExistEXception = Desired S3 Bucket not found exception. S3Bucket : {0}
+        S3ObjectNotExistEXception = Desired S3 Object not found in S3Bucket exception. S3Bucket : {0}, S3Object : {1}
+        ScriptBlockException = Error thrown on ScriptBlock. ScriptBlock : {0}
     "
 }
 
@@ -107,11 +109,6 @@ function Get-TargetResource
         [System.String]$CheckSum = [GraniDonwloadCheckSumtype]::FileHash.ToString()
     )
 
-
-    # validate S3 Bucket is exist
-    ValidateS3Bucket -BucketName $S3BucketName
-    ValidateS3Object -BucketName $S3BucketName -Key $Key
-
     # Initialize return values
     # Header and OAuth2Token will never return as TypeConversion problem
     $returnHash = 
@@ -126,64 +123,87 @@ function Get-TargetResource
         CheckSum = $CheckSum
     }
 
-    # Destination Path check
-    Write-Debug -Message $debugMessage.IsDestinationPathExist
-    $itemType = GetPathItemType -Path $DestinationPath
-
-    $fileExists = $false
-    switch ($itemType.ToString())
+    try
     {
-        ([GraniDonwloadItemTypeEx]::FileInfo.ToString())
-        {
-            Write-Debug -Message ($debugMessage.ItemTypeWasFile -f $DestinationPath)
-            $fileExists = $true
+        # Fail fast S3Bucket and S3Object existance.
+        $isBucketExist = Test-S3Bucket -BucketName $S3BucketName;
+        if (-not $isBucketExist)
+        {        
+            Write-Verbose -Message ($verboseMessage.ResultS3Bucket -f $S3BucketName, $isBucketExist);
+            return $returnHash
         }
-        ([GraniDonwloadItemTypeEx]::DirectoryInfo.ToString())
-        {
-            Write-Debug -Message ($debugMessage.ItemTypeWasDirectory -f $DestinationPath)
+        $isObjectExist = TestS3Object -BucketName $S3BucketName -Key $Key;
+        if (-not $isObjectExist)
+        {        
+            Write-Verbose -Message ($verboseMessage.ResultS3Object -f $Key, $isObjectExist);
+            return $returnHash
         }
-        ([GraniDonwloadItemTypeEx]::Other.ToString())
-        {
-            Write-Debug -Message ($debugMessage.ItemTypeWasOther -f $DestinationPath)
-        }
-        ([GraniDonwloadItemTypeEx]::NotExists.ToString())
-        {
-            Write-Debug -Message ($debugMessage.ItemTypeWasNotExists -f $DestinationPath)
-        }
-    }
 
-    # Already Up-to-date Check
-    if ($fileExists -eq $true)
-    {
-        Write-Debug -Message $debugMessage.FileExists
-        switch ($CheckSum)
+        # Start checking destination Path check if S3Bucket and S3Object exists
+        Write-Debug -Message $debugMessage.IsDestinationPathExist
+        $itemType = GetPathItemType -Path $DestinationPath
+
+        $fileExists = $false
+        switch ($itemType.ToString())
         {
-            ([GraniDonwloadCheckSumtype]::FileHash.ToString())
+            ([GraniDonwloadItemTypeEx]::FileInfo.ToString())
             {
-                Write-Debug -Message ($debugMessage.IsDestinationPathAlreadyUpToDate -f $CheckSum)
-                $currentFileHash = GetFileHash -Path $DestinationPath
-                $s3ObjectCache = GetS3ObjectHash -BucketName $S3BucketName -Key $Key
+                Write-Debug -Message ($debugMessage.ItemTypeWasFile -f $DestinationPath)
+                $fileExists = $true
+            }
+            ([GraniDonwloadItemTypeEx]::DirectoryInfo.ToString())
+            {
+                Write-Debug -Message ($debugMessage.ItemTypeWasDirectory -f $DestinationPath)
+            }
+            ([GraniDonwloadItemTypeEx]::Other.ToString())
+            {
+                Write-Debug -Message ($debugMessage.ItemTypeWasOther -f $DestinationPath)
+                return $returnHash
+            }
+            ([GraniDonwloadItemTypeEx]::NotExists.ToString())
+            {
+                Write-Debug -Message ($debugMessage.ItemTypeWasNotExists -f $DestinationPath)
+                return $returnHash
+            }
+        }
 
-                Write-Debug -Message ($debugMessage.IsFileAlreadyUpToDate -f $currentFileHash, $s3ObjectCache)
-                if ($currentFileHash -eq $s3ObjectCache)
+        # Already Up-to-date Check
+        if ($fileExists -eq $true)
+        {
+            Write-Debug -Message $debugMessage.FileExists
+            switch ($CheckSum)
+            {
+                ([GraniDonwloadCheckSumtype]::FileHash.ToString())
                 {
-                    Write-Verbose -Message $verboseMessage.AlreadyUpToDate
+                    Write-Debug -Message ($debugMessage.IsDestinationPathAlreadyUpToDate -f $CheckSum)
+                    $currentFileHash = GetFileHash -Path $DestinationPath
+                    $s3ObjectCache = GetS3ObjectHash -BucketName $S3BucketName -Key $Key
+
+                    Write-Debug -Message ($debugMessage.IsFileAlreadyUpToDate -f $currentFileHash, $s3ObjectCache)
+                    if ($currentFileHash -eq $s3ObjectCache)
+                    {
+                        Write-Verbose -Message $verboseMessage.AlreadyUpToDate
+                        $returnHash.Ensure = [GraniDonwloadEnsuretype]::Present.ToString()
+                    }
+                    else
+                    {
+                        Write-Verbose -Message $verboseMessage.NotUpToDate
+                    }
+                }
+                ([GraniDonwloadCheckSumtype]::FileName.ToString())
+                {
+                    # FileName only check : Is destination file exists or not.
+                    Write-Debug -Message ($debugMessage.IsCheckSumFileName -f $CheckSum)
                     $returnHash.Ensure = [GraniDonwloadEnsuretype]::Present.ToString()
                 }
-                else
-                {
-                    Write-Verbose -Message $verboseMessage.NotUpToDate
-                }
-            }
-            ([GraniDonwloadCheckSumtype]::FileName.ToString())
-            {
-                # FileName only check : Is destination file exists or not.
-                Write-Debug -Message ($debugMessage.IsCheckSumFileName -f $CheckSum)
-                $returnHash.Ensure = [GraniDonwloadEnsuretype]::Present.ToString()
             }
         }
     }
-
+    catch
+    {
+        Write-Error $_
+    }
+    
     return $returnHash
 }
 
@@ -340,7 +360,7 @@ function ValidateS3Object
     Write-Debug -Message ($debugMessage.ValidateS3Object -f $Key)
     if (-not (TestS3Object -BucketName $BucketName -Key $Key))
     {
-        throw New-Object System.NullReferenceException ($exceptionMessage.S3ObjectNotExistEXception -f $S3Object)
+        throw New-Object System.NullReferenceException ($exceptionMessage.S3ObjectNotExistEXception -f $BucketName, $Key)
     }
 }
 
