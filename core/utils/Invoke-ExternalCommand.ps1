@@ -165,13 +165,13 @@ function Invoke-ExternalCommand {
                 if ($PSCIGlobalConfiguration.LogFile -and !$Quiet) {
                     # running command line in <=PS4 needs special treatment to handle all cases...
                     if ($PSVersionTable.PSVersion.Major -gt 4) {
-                        . $env:ComSpec /C "$Command" $stdinRedirect | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
+                        . $env:ComSpec /C ""$Command" $stdinRedirect" | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
                     } else { 
                         . $env:ComSpec /C """$Command"" $stdinRedirect" | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
                     }
                 } else {
                     if ($PSVersionTable.PSVersion.Major -gt 4) {
-                        . $env:ComSpec /C "$Command" $stdinRedirect
+                        . $env:ComSpec /C ""$Command" $stdinRedirect"
                     } else { 
                         . $env:ComSpec /C """$Command"" $stdinRedirect"
                     }
@@ -208,7 +208,7 @@ function Invoke-ExternalCommand {
                 Remove-PSSession -Session $remotesession
             } else {
                 if ($PSVersionTable.PSVersion.Major -gt 4) {
-                    . $env:ComSpec /C "$Command" $stdinRedirect 2>&1 | % { 
+                    . $env:ComSpec /C ""$Command" $stdinRedirect" 2>&1 | % { 
                         if ($_ -is [System.Management.Automation.ErrorRecord]) {
                             Write-Log -Error ("[STDERR] " + $_) -NoHeader
                             $stdErrOutputPresent = $true
