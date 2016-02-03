@@ -163,9 +163,18 @@ function Invoke-ExternalCommand {
                 Remove-PSSession -Session $remotesession
             } else {
                 if ($PSCIGlobalConfiguration.LogFile -and !$Quiet) {
-                    . $env:ComSpec /C """$Command"" $stdinRedirect" | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
+                    # running command line in <=PS4 needs special treatment to handle all cases...
+                    if ($PSVersionTable.PSVersion.Major -gt 4) {
+                        . $env:ComSpec /C "$Command" $stdinRedirect | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
+                    } else { 
+                        . $env:ComSpec /C """$Command"" $stdinRedirect" | Tee-Object -File $PSCIGlobalConfiguration.LogFile -Append
+                    }
                 } else {
-                    . $env:ComSpec /C """$Command"" $stdinRedirect"
+                    if ($PSVersionTable.PSVersion.Major -gt 4) {
+                        . $env:ComSpec /C "$Command" $stdinRedirect
+                    } else { 
+                        . $env:ComSpec /C """$Command"" $stdinRedirect"
+                    }
                 }
             }
         } else {
@@ -198,23 +207,48 @@ function Invoke-ExternalCommand {
                 $global:lastexitcode = Invoke-Command -ScriptBlock { $lastexitcode } -Session $remotesession
                 Remove-PSSession -Session $remotesession
             } else {
-                . $env:ComSpec /C """$Command"" $stdinRedirect" 2>&1 | % { 
-                    if ($_ -is [System.Management.Automation.ErrorRecord]) {
-                        Write-Log -Error ("[STDERR] " + $_) -NoHeader
-                        $stdErrOutputPresent = $true
-                    } else {
-                        $trimmedMessage = $_.Trim(); 
-                        if ($trimmedMessage) { 
-                            $message = "[STDOUT] " + $trimmedMessage;
-                            if ($RemoveMessagePrefix -and $message.StartsWith($RemoveMessagePrefix)) {
-                                $message = $message.Remove(0, $RemoveMessagePrefix.Length).Trim()
-                            }
-
-                            if ($message) {
-                                if (!$Output -and !$Quiet) {
-                                    Write-Log -Info ($message) -NoHeader
+                if ($PSVersionTable.PSVersion.Major -gt 4) {
+                    . $env:ComSpec /C "$Command" $stdinRedirect 2>&1 | % { 
+                        if ($_ -is [System.Management.Automation.ErrorRecord]) {
+                            Write-Log -Error ("[STDERR] " + $_) -NoHeader
+                            $stdErrOutputPresent = $true
+                        } else {
+                            $trimmedMessage = $_.Trim(); 
+                            if ($trimmedMessage) { 
+                                $message = "[STDOUT] " + $trimmedMessage;
+                                if ($RemoveMessagePrefix -and $message.StartsWith($RemoveMessagePrefix)) {
+                                    $message = $message.Remove(0, $RemoveMessagePrefix.Length).Trim()
                                 }
-                                $stdOut += $message
+
+                                if ($message) {
+                                    if (!$Output -and !$Quiet) {
+                                        Write-Log -Info ($message) -NoHeader
+                                    }
+                                    $stdOut += $message
+                                }
+                            }
+                        }
+                    }
+                } else { 
+                    # this is dirty copy-paste from above (apart from quotes)
+                    . $env:ComSpec /C """$Command"" $stdinRedirect" 2>&1 | % { 
+                        if ($_ -is [System.Management.Automation.ErrorRecord]) {
+                            Write-Log -Error ("[STDERR] " + $_) -NoHeader
+                            $stdErrOutputPresent = $true
+                        } else {
+                            $trimmedMessage = $_.Trim(); 
+                            if ($trimmedMessage) { 
+                                $message = "[STDOUT] " + $trimmedMessage;
+                                if ($RemoveMessagePrefix -and $message.StartsWith($RemoveMessagePrefix)) {
+                                    $message = $message.Remove(0, $RemoveMessagePrefix.Length).Trim()
+                                }
+
+                                if ($message) {
+                                    if (!$Output -and !$Quiet) {
+                                        Write-Log -Info ($message) -NoHeader
+                                    }
+                                    $stdOut += $message
+                                }
                             }
                         }
                     }
