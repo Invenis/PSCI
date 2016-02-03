@@ -205,6 +205,10 @@ about_pester
 
     foreach ($testScript in $testScripts)
     {
+        if ($testScript.Path -imatch 'PSGallery') {   
+            continue
+        }
+        Write-Host "Running: $($testScript.Path)"
         try
         {
             do
