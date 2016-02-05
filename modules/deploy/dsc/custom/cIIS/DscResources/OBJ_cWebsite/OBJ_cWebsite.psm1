@@ -813,10 +813,10 @@ function Update-WebsiteBinding
                 $NewWebbinding = Get-WebBinding -Name $Name -Port $Port
                 $NewWebbinding.AddSslCertificate($CertificateThumbprint, $CertificateStoreName)
             } elseif ($SelfSignedCertificate) {
-                if (!$HostName) {
+                if (!$HostHeader) {
                     $dnsName = (hostname)
                 } else {
-                    $dnsName = $HostName
+                    $dnsName = $HostHeader
                 }
                 $cert = Get-ChildItem -Path 'cert:\LocalMachine\My' | Where-Object { $_.Subject -imatch "CN=$dnsName" } | Sort-Object NotBefore -Descending | Select-Object -First 1
                 
