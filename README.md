@@ -19,7 +19,7 @@ PSCI provides following features:
 - Supports several methods of tokenizing configuration files (e.g. Web.config) - directly replace tokens in files (using regex), transform using XDT (Web.\<env_name\>.config) or use Web Deploy parameterization.
 - Supports Windows Server 2008 R2 SP1 / 7 and above (some available DSC resources like xWebsite have been fixed to work with pre-Server 2012).
 
-Additionally, [PSCI.teamcityExtensions](https://github.com/ObjectivityBSS/PSCI.teamcityExtensions/wiki) provides set of TeamCity metarunners that makes use of PSCI functions.
+Additionally, [PSCI.teamcityExtensions](https://github.com/ObjectivityBSS/PSCI.teamcityExtensions/wiki) provides a set of TeamCity metarunners that make use of PSCI functions.
 
 #### Where to start?
 -------------
