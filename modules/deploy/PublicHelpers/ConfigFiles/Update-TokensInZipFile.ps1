@@ -69,7 +69,7 @@ function Update-TokensInZipFile {
         [string] 
         $ZipFile, 
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string] 
         $OutputFile,
         
