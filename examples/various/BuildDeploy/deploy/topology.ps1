@@ -47,6 +47,8 @@ Environment Default {
     ServerRole RemotingTestPSRemotingCredSSP -Steps @('Prepare-RemotingTest', 'Validate-RemotingTest') -RunRemotely -ServerConnections TestNodePSRemotingCredSSP
     ServerRole RemotingTestMSDeploy -Steps @('Prepare-RemotingTest', 'Validate-RemotingTest') -RunRemotely -ServerConnections TestNodeMSDeploy
 
+    ServerRole OutputsTest -Steps @('Outputs-FirstPass', 'Outputs-SecondPass') -ServerConnections TestNodeDefault
+
     StepSettings Prepare-RemotingTest -RequiredPackages RemotingTest
 }
 

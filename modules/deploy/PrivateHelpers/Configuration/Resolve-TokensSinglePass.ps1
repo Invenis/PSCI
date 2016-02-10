@@ -49,6 +49,9 @@ function Resolve-TokensSinglePass {
     .PARAMETER ValidateExistence
     Whether to validate existence of the referenced token.
 
+    .PARAMETER Outputs
+    Hashtable with externally set output values, used to pass values between deployment steps.
+
     .EXAMPLE
     Resolve-TokensSinglePass -ResolvedTokens $resolvedTokens -Environment $Environment -Node $Node -ResolveFunction $resolveTokenFunction -ValidateExistence:$false
     #>
@@ -78,7 +81,11 @@ function Resolve-TokensSinglePass {
 
         [Parameter(Mandatory=$false)]
         [switch]
-        $ValidateExistence
+        $ValidateExistence,
+
+        [Parameter(Mandatory=$false)]
+        [hashtable]
+        $Outputs
     )
     foreach ($category in $resolvedTokens.Keys) {
         $tokensCatKeys = @()
@@ -100,6 +107,7 @@ function Resolve-TokensSinglePass {
                 Environment = $Environment
                 Node = $Node
                 ValidateExistence = $ValidateExistence
+                Outputs = $Outputs
             }
             $resolvedTokens[$category][$tokenKey] = Resolve-SingleTokenRecursively @params
         }
@@ -138,6 +146,9 @@ function Resolve-SingleTokenRecursively {
 
     .PARAMETER ValidateExistence
     Whether to validate existence of the referenced token.
+    
+    .PARAMETER Outputs
+    Hashtable with externally set output values, used to pass values between deployment steps.
 
     .EXAMPLE
     Resolve-SingleTokenRecursively @params
@@ -180,7 +191,11 @@ function Resolve-SingleTokenRecursively {
 
         [Parameter(Mandatory=$false)]
         [switch]
-        $ValidateExistence
+        $ValidateExistence,
+
+        [Parameter(Mandatory=$false)]
+        [hashtable]
+        $Outputs
     )
 
     $params = @{
@@ -216,7 +231,7 @@ function Resolve-SingleTokenRecursively {
         return $newValue
     } elseif ($ResolveScriptBlocks -and $TokenValue -is [scriptblock]) {
         try { 
-            $newValue = Resolve-ScriptedToken -TokenName $TokenName -ScriptedToken $TokenValue -TokenCategory $TokenCategory -ResolvedTokens $ResolvedTokens -Node $Node -Environment $Environment
+            $newValue = Resolve-ScriptedToken -TokenName $TokenName -ScriptedToken $TokenValue -TokenCategory $TokenCategory -ResolvedTokens $ResolvedTokens -Node $Node -Environment $Environment -Outputs $Outputs
         } catch {
             throw ("Cannot evaluate token '$Environment / $TokenCategory / $TokenName'. Error message: {0} / token value: {{ {1} }}" -f $_.Exception.Message, $TokenValue)
         }

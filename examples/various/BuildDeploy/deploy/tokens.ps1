@@ -53,5 +53,9 @@ Environment Default {
         WebsiteName = 'PSCITest'
         WebsitePort = '${WebsitePortCategory.WebsitePort}'
     }
+
+    Tokens OutputPassing @{
+        TokenWithOutput = { $Outputs.TestCategory.TestValue }
+    }
 }
 

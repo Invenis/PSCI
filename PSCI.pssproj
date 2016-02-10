@@ -2118,6 +2118,7 @@
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Build-TemporaryPackage.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Get-CommandParametersAst.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Get-IncludePackageList.ps1" />
+    <Compile Include="modules\deploy\PrivateHelpers\Configuration\Get-Outputs.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Group-DeploymentPlan.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Group-DeploymentPlan.Tests.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Invoke-DeploymentStep.ps1" />
@@ -2129,6 +2130,7 @@
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-DeploymentPlanSteps.Tests.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-OverrideTokenValue.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-ScriptedToken.ps1" />
+    <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-ScriptedToken.Tests.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-ServerConnectionConfigElement.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-ServerConnections.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Resolve-ServerConnectionsConfigElements.ps1" />
@@ -2147,6 +2149,8 @@
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Start-DeploymentPlan.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Start-DeploymentPlanEntryLocally.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\Configuration\Start-DeploymentPlanEntryRemotely.ps1" />
+    <Compile Include="modules\deploy\PrivateHelpers\Configuration\Update-Outputs.ps1" />
+    <Compile Include="modules\deploy\PrivateHelpers\Configuration\Update-Outputs.Tests.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\DscHelpers\Enable-FreshCredNtlmOnlyDelegation.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\DscHelpers\Start-DscConfigurationWithRetries.ps1" />
     <Compile Include="modules\deploy\PrivateHelpers\DtUtil\Get-CurrentDtUtilPath.ps1" />
