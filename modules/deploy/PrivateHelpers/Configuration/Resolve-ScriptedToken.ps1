@@ -26,6 +26,10 @@ function Resolve-ScriptedToken {
     <#
     .SYNOPSIS
     Resolves token if it is provided as ScriptBlock.
+    
+    .DESCRIPTION
+    Works for $Tokens and $Outputs scripts. The $Outputs is resolved only when passed hashtable contains 
+    specified value, otherwise ScriptBlock is not resolved and returned as provided..
 
     .PARAMETER ScriptedToken
     Object to resolve if it is a ScriptBlock
@@ -44,6 +48,9 @@ function Resolve-ScriptedToken {
 
     .PARAMETER Environment
     Value of $Environment variable that will be available inside the scriptblock.
+
+    .PARAMETER Outputs
+    Value of $Outputs variable that will be availabe inside the scriptblock.
 
     .EXAMPLE
         $credentials = Resolve-ScriptedToken {$Tokens.General.Credentials}
@@ -75,36 +82,39 @@ function Resolve-ScriptedToken {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $Environment
+        $Environment,
+
+        [Parameter(Mandatory=$false)]
+        [hashtable]
+        $Outputs
     )
 
     # Add 'NodeName' and 'Tokens' variables
-
     $contextVariables = @(
         (New-Object -TypeName System.Management.Automation.PSVariable -ArgumentList 'NodeName', $Node),
         (New-Object -TypeName System.Management.Automation.PSVariable -ArgumentList 'Node', $Node),
         (New-Object -TypeName System.Management.Automation.PSVariable -ArgumentList 'Tokens', $ResolvedTokens)
+        (New-Object -TypeName System.Management.Automation.PSVariable -ArgumentList 'Outputs', $Outputs)
         (New-Object -TypeName System.Management.Automation.PSVariable -ArgumentList 'Environment', $Environment)
     )
 
     $i = 0
 
-    $tokensRegexMatch = '\$Tokens\.(\w+)\.(\w+)'
+    $tokensRegexMatch = '(\$Tokens|\$Outputs)\.(\w+)\.(\w+)'
     while ($ScriptedToken -is [ScriptBlock] -and $i -lt 20) {
         if ($ScriptedToken.ToString() -imatch $tokensRegexMatch) {
-            $refTokenCategory = $Matches[1]
-            $refTokenName = $Matches[2]
-            if (!$ResolvedTokens.ContainsKey($refTokenCategory) -or !$ResolvedTokens[$refTokenCategory].ContainsKey($refTokenName)) {
-                if ($TokenCategory) {
-                    $tokenLog = "$TokenCategory.$TokenName"
-                } else {
-                    $tokenLog = $TokenName
+            $itemType = $Matches[1]
+            $refTokenCategory = $Matches[2]
+            $refTokenName = $Matches[3]
+            $refTokenFullName = "$refTokenCategory.$refTokenName"
+            if ($itemType -eq '$Tokens') {
+                if (!$ResolvedTokens.ContainsKey($refTokenCategory) -or !$ResolvedTokens[$refTokenCategory].ContainsKey($refTokenName)) {
+                    Write-MissingToken -ScriptedToken $ScriptedToken -TokenName $TokenName -TokenCategory $TokenCategory -Environment $Environment -ItemType $itemType -MissingTokenName $refTokenFullName
                 }
-                $missingTokenName = "$refTokenCategory.$refTokenName"
-                if ($Global:MissingScriptBlockTokens -and !$Global:MissingScriptBlockTokens.ContainsKey($missingTokenName)) { 
-                    # This is to prevent logging the same warning multiple times (tokens are resolved for each deployment plan step)
-                    $Global:MissingScriptBlockTokens[$missingTokenName] = $true
-                    Write-Log -Warn "Cannot resolve '`$Tokens.$missingTokenName' in token '$tokenLog' = '{$($ScriptedToken.ToString())}' / Environment '$Environment'."
+            } elseif ($itemType -eq '$Outputs') {
+                if (!$Outputs -or !$Outputs.ContainsKey($refTokenCategory) -or !$Outputs[$refTokenCategory].ContainsKey($refTokenName)) {
+                    Write-MissingToken -ScriptedToken $ScriptedToken -TokenName $TokenName -TokenCategory $TokenCategory -Environment $Environment -ItemType $itemType -MissingTokenName $refTokenFullName
+                    break
                 }
             }
         }        
@@ -124,4 +134,75 @@ function Resolve-ScriptedToken {
     }
 
     return $ScriptedToken
+}
+
+function Write-MissingToken {
+    <#
+    .SYNOPSIS
+    Helper functions, logs the warn message for missing tokens.
+
+    .PARAMETER ScriptedToken
+    Object to resolve if it is a ScriptBlock
+
+    .PARAMETER TokenName
+    Token name (only for logging purposes).
+
+    .PARAMETER TokenCategory
+    Name of category the parsed token belongs to (only for logging purposes).
+
+    .PARAMETER Environment
+    The name of the environment.
+
+    .PARAMETER ItemType
+    The type of the missing token ($Tokens or $Outputs)
+
+    .PARAMETER MissingTokenName
+    The name of the missing token, concatenated category and name.
+
+    .EXAMPLE
+    Write-MissingToken $params
+
+    #>
+    
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [AllowNull()]
+        [object]
+        $ScriptedToken,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $TokenName,
+
+        [Parameter(Mandatory=$false)]
+        [string] 
+        $TokenCategory,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Environment,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ItemType,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $MissingTokenName
+
+    )
+
+    if ($TokenCategory) {
+        $tokenLog = "$TokenCategory.$TokenName"
+    } else {
+        $tokenLog = $TokenName
+    }
+    
+    if ($Global:MissingScriptBlockTokens -and !$Global:MissingScriptBlockTokens.ContainsKey($missingTokenName)) { 
+        # This is to prevent logging the same warning multiple times (tokens are resolved for each deployment plan step)
+        $Global:MissingScriptBlockTokens[$missingTokenName] = $true
+        Write-Log -Warn "Cannot resolve '$ItemType.$MissingTokenName' in token '$tokenLog' = '{$($ScriptedToken.ToString())}' / Environment '$Environment'."
+    }
 }
