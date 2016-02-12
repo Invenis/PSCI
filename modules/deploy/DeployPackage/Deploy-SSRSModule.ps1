@@ -68,8 +68,10 @@ function Deploy-SSRSModule {
     # Get MSRS paths
     foreach ($instance in $instances) {
         $msrsInstanceName = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\RS').$instance
-        $sqlPath = Join-Path -Path (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$msrsInstanceName\Setup").SQLPath -ChildPath "\$SSRSExtensionDir\bin\"
-        [void]$paths.Add($sqlPath)
+		if ($msrsInstanceName) {
+			$sqlPath = Join-Path -Path (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$msrsInstanceName\Setup").SQLPath -ChildPath "\$SSRSExtensionDir\bin\"			
+			[void]$paths.Add($sqlPath)
+		}
     }
 
     # Get VS paths
