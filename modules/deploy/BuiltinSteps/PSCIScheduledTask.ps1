@@ -130,12 +130,11 @@ configuration PSCIScheduledTask {
                     RunLevel = if ($task.RunLevel) { $task.RunLevel } else { 'Highest' }
                     Compatibility = if ($task.Compatibility) { $task.Compatibility } else { 'Win8' }
                     ScheduledAt = $task.ScheduledAt
-                    ScheduledTimeSpanDay = $task.ScheduledTimeSpanDay
-                    ScheduledTimeSpanHour = $task.ScheduledTimeSpanHour
-                    ScheduledTimeSpanMin = $task.ScheduledTimeSpanMin
-                    ScheduledDurationDay = 0
-                    ScheduledDurationHour = 0
-                    ScheduledDurationMin = 0
+                    RepetitionIntervalTimeSpanString = (
+                        [TimeSpan]::FromDays($task.ScheduledTimeSpanDay) +
+                        [TimeSpan]::FromHours($task.ScheduledTimeSpanHour) +
+                        [TimeSpan]::FromMinutes($task.ScheduledTimeSpanMin)
+                    ).ToString()
                     Disable = $false
                     Hidden = $false               
 
