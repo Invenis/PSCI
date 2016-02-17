@@ -24,7 +24,7 @@ SOFTWARE.
 
 function New-AzureSASKey {
     <#
-    .SYNOPIS
+    .SYNOPSIS
     Creates a new randomly generated 32 bytes long SAS token.
 
     .DESCRIPTION
