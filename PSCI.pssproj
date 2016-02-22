@@ -904,6 +904,7 @@
     <Compile Include="modules\build\PublicHelpers\Backup-Files.ps1" />
     <Compile Include="modules\build\PublicHelpers\Get-AssemblyVersion.ps1" />
     <Compile Include="modules\build\PublicHelpers\Install-NugetPackage.ps1" />
+    <Compile Include="modules\build\PublicHelpers\Invoke-Devenv.ps1" />
     <Compile Include="modules\build\PublicHelpers\Invoke-MsBuild.ps1" />
     <Compile Include="modules\build\PublicHelpers\New-MsBuildOptions.ps1" />
     <Compile Include="modules\build\PublicHelpers\Remove-PackagesDir.ps1" />
@@ -2190,6 +2191,8 @@
     <Compile Include="modules\deploy\PrivateHelpers\Update-ConfigFile\Get-UpdateXsltCmdParams.Tests.ps1" />
     <Compile Include="modules\deploy\PSCI.deploy.psd1" />
     <Compile Include="modules\deploy\PSCI.deploy.psm1" />
+    <Compile Include="modules\deploy\PublicHelpers\Azure\New-AzureSASKey.ps1" />
+    <Compile Include="modules\deploy\PublicHelpers\Azure\New-AzureSASKey.Tests.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\New-EventLogSource.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\Protect-WebConfig.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\Protect-WebConfig.Tests.ps1" />
@@ -2197,6 +2200,9 @@
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\Update-TokensInAllFiles.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\Update-TokensInZipFile.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\ConfigFiles\Update-TokensInZipFile.Tests.ps1" />
+    <Compile Include="modules\deploy\PublicHelpers\Configuration\Get-Outputs.ps1" />
+    <Compile Include="modules\deploy\PublicHelpers\Configuration\Update-Outputs.ps1" />
+    <Compile Include="modules\deploy\PublicHelpers\Configuration\Update-Outputs.Tests.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\Database\Publish-EntityFrameworkMigrate.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\Database\Set-SqlServerFilestream.ps1" />
     <Compile Include="modules\deploy\PublicHelpers\Database\Start-SqlServerAgentJob.ps1" />
@@ -3174,7 +3180,9 @@
     <Folder Include="modules\deploy\PrivateHelpers\Tokens\" />
     <Folder Include="modules\deploy\PrivateHelpers\Update-ConfigFile\" />
     <Folder Include="modules\deploy\PublicHelpers\" />
+    <Folder Include="modules\deploy\PublicHelpers\Azure\" />
     <Folder Include="modules\deploy\PublicHelpers\ConfigFiles\" />
+    <Folder Include="modules\deploy\PublicHelpers\Configuration\" />
     <Folder Include="modules\deploy\PublicHelpers\Database\" />
     <Folder Include="modules\deploy\PublicHelpers\DscHelpers\" />
     <Folder Include="modules\deploy\PublicHelpers\DSL\" />
