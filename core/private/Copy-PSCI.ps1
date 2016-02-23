@@ -84,14 +84,14 @@ function Copy-PSCI {
         foreach ($module in $modules) {
             $srcPath = Get-PSCIModulePath -Module $module
             $dstPath = Join-Path -Path $OutputPathPsci -ChildPath (Resolve-Path -LiteralPath $srcPath -Relative)
-            Sync-DirectoriesWithRobocopy -SrcPath $srcPath -DestPath $dstPath -Quiet -ExcludeFiles '*Tests.ps1'    
+            Sync-DirectoriesWithRobocopy -SrcPath $srcPath -DestPath $dstPath -Quiet -ExcludeFiles '*.Tests.ps1'    
         }
 
         # copy PSCI.deploy
         $srcPath = Get-PSCIModulePath -Module 'PSCI.deploy'
         $dstPath = Join-Path -Path $OutputPathPsci -ChildPath (Resolve-Path -LiteralPath $srcPath -Relative)
         # note there can be issue with 260 path length limitation
-        Sync-DirectoriesWithRobocopy -SrcPath $srcPath -DestPath $dstPath -Quiet -ExcludeFiles '*Tests.ps1' -ExcludeDirs 'dsc' 
+        Sync-DirectoriesWithRobocopy -SrcPath $srcPath -DestPath $dstPath -Quiet -ExcludeFiles '*.Tests.ps1' -ExcludeDirs 'dsc' 
         
         # copy required DSC modules
         $dscSrc = Join-Path -Path $srcPath -ChildPath 'dsc'
