@@ -144,9 +144,16 @@ function Update-TokensInZipFile {
         foreach ($configFileEntry in $configFileEntries) {
             if ($configFileEntry.Name -imatch $TokenEnvironmentRegex) {
                 $baseFileName = $Matches[1] + $Matches[3]
-                $baseFullFileName = Join-Path -Path (Split-Path -Path $configFileEntry.FullName -Parent) -ChildPath $baseFileName
+
+                $baseDir = Split-Path -Path $configFileEntry.FullName -Parent
+                if ($baseDir) {
+                    $baseFullFileName = Join-Path -Path $baseDir -ChildPath $baseFileName
+                } else {
+                    $baseFullFileName = $baseFileName
+                }
+                
                 $baseFullFileName = $baseFullFileName -replace '\\', '/'
-                if ($configFileEntries.Where({ $_.FullName -ieq $baseFullFileName})) {
+                if ($configFileEntries | Where-Object { $_.FullName -ieq $baseFullFileName}) {
                     $xdtTransformConfigs += $configFileEntry
                 }
             }

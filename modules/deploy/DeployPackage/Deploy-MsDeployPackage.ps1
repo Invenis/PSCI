@@ -253,9 +253,9 @@ function Deploy-MsDeployPackage {
         Sync-MsDeployDirectory -SourcePath $packageCopyPath -DestString $MsDeployDestinationString -AddParameters $MsDeployAddParameters -UseChecksum:$UseChecksum
     } elseif ($PackageType -eq "Dir") {
         Write-Log -Info "Deploying directory package '$PackageName' to server '$Node'" -Emphasize
-        if ($PackagePath.ToLower().EndsWith("zip")) {
+        if ($packageCopyPath.ToLower().EndsWith("zip")) {
             $tempDir = New-TempDirectory
-            Expand-Zip -ArchiveFile $PackagePath -OutputDirectory $tempDir
+            Expand-Zip -ArchiveFile $packageCopyPath -OutputDirectory $tempDir
         } else {
             $tempDir = $PackagePath
         }
