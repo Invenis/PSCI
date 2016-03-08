@@ -157,6 +157,7 @@ function Resolve-ServerRoles {
         if ($serverRoleValue.ContainsKey('Enabled')) { 
             $serverRoleEnabled = Resolve-ScriptedToken -ScriptedToken $serverRoleValue.Enabled -ResolvedTokens $ResolvedTokens -Environment $Environment -TokenName "[ServerRole '$($serverRole.Name)' / -Enabled]"
             if ($serverRoleEnabled -eq $false) {
+                Write-Log -Info "Environment '$Environment' / ServerRole '$($serverRole.Name)' is disabled and will not be deployed."
                 continue
             }
         }
