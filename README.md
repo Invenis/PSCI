@@ -21,6 +21,10 @@ PSCI provides following features:
 
 Additionally, [PSCI.teamcityExtensions](https://github.com/ObjectivityBSS/PSCI.teamcityExtensions/wiki) provides a set of TeamCity metarunners that make use of PSCI functions.
 
+#### Why PSCI?
+
+See [Why PSCI](https://github.com/ObjectivityBSS/PSCI/wiki/Why%20PSCI).
+
 #### Where to start?
 -------------
 - See [Getting started](https://github.com/ObjectivityBSS/PSCI/wiki/Getting-started).
