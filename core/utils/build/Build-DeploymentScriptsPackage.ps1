@@ -29,7 +29,7 @@ function Build-DeploymentScriptsPackage {
 
     .DESCRIPTION
     It copies the following to the destination package:
-    - PSCI library to $OutputPathPsci - by default only core functions, PSCI.deploy module and DSC modules that are used in configuration files will be copied.
+    - PSCI library to $OutputPathPsci (if $CreatePsciPackage); by default only core functions, PSCI.deploy module and DSC modules that are used in configuration files will be copied.
       If you need additional modules or external libraries, use $ModulesToInclude or $ExternalLibsToInclude parameters.
     - deploy.ps1 from current directory to $OutputPathDeploymentScripts
     - project configuration files (tokens / server roles) from $deployConfigurationPath to $OutputPathDeploymentScripts\deploy.
@@ -40,6 +40,9 @@ function Build-DeploymentScriptsPackage {
     
     .PARAMETER ReplaceDeployScriptParameters
     If true, default variable values (paths) in deploy.ps1 file will be updated to reflect the default package directory structure.
+
+    .PARAMETER CreatePsciPackage
+    If true, the package with PSCI library will be created.
 
     .PARAMETER OutputPathPsci
     Output path where the PSCI package will be created. If not provided, $OutputPath = $PackagesPath\PSCI, where $PackagesPath is taken from global variable.
@@ -65,6 +68,10 @@ function Build-DeploymentScriptsPackage {
         $ReplaceDeployScriptParameters = $true,
 
         [Parameter(Mandatory=$false)]
+        [switch]
+        $CreatePsciPackage = $true,
+
+        [Parameter(Mandatory=$false)]
         [string]
         $OutputPathPsci,
 
@@ -79,29 +86,29 @@ function Build-DeploymentScriptsPackage {
         [Parameter(Mandatory=$false)]
         [string[]]
         $ExternalLibsToInclude
-
     )
+
     Write-Log -Info 'Building DeployScripts and PSCI packages' -Emphasize
 
     Write-ProgressExternal -Message 'Building DeployScripts'
 
     $configPaths = Get-ConfigurationPaths
-       
-    $OutputPathPsci = Resolve-PathRelativeToProjectRoot `
+
+    if ($CreatePsciPackage) {
+        $OutputPathPsci = Resolve-PathRelativeToProjectRoot `
                             -Path $OutputPathPsci `
                             -DefaultPath (Join-Path -Path $configPaths.PackagesPath -ChildPath "PSCI") `
                             -CheckExistence:$false
+
+        Copy-PSCI -OutputPathPsci $OutputPathPsci `
+                  -ModulesToInclude $ModulesToInclude `
+                  -ExternalLibsToInclude $ExternalLibsToInclude
+    }
 
     $OutputPathDeploymentScripts = Resolve-PathRelativeToProjectRoot `
                             -Path $OutputPathDeploymentScripts `
                             -DefaultPath (Join-Path -Path $configPaths.PackagesPath -ChildPath "DeployScripts") `
                             -CheckExistence:$false
-
-    
-    Copy-PSCI -OutputPathPsci $OutputPathPsci `
-              -ModulesToInclude $ModulesToInclude `
-              -ExternalLibsToInclude $ExternalLibsToInclude
-
 
     Copy-DeploymentScripts -OutputDeployScriptsPath $OutputPathDeploymentScripts `
                            -OutputDeployConfigurationPath "$OutputPathDeploymentScripts\deploy"
