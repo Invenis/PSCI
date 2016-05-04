@@ -204,7 +204,7 @@ function Deploy-SSISIspac {
                 }
                 # TODO: handle sensitive variables ($false -> $true)
                 # Constructor args: variable name, typeCode, default value, sensitivity, description
-                $ssisEnvironment.Variables.Add($variableName, $variableName.GetTypeCode(), $variableValue, $false, $variableName)
+                $ssisEnvironment.Variables.Add($variableName, $variableValue.GetTypeCode(), $variableValue, $false, $variableName)
             }
             $ssisEnvironment.Create()
         }
