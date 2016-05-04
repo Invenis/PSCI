@@ -60,6 +60,6 @@ function Expand-With7Zip {
     if ($Password) {
         $7zip += " -p$($Password.GetNetworkCredential().Password)"
     }
-    Write-Log -Info "Uncompressing file '$ArchiveFile' with 7zip."
+    Write-Log -Info "Uncompressing file '$ArchiveFile' with 7zip into $OutputDirectory..."
     [void](Invoke-ExternalCommand -Command $7zip -Quiet)
 }
