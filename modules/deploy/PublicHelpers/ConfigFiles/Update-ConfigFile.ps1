@@ -156,7 +156,7 @@ function Update-ConfigFile {
     $output = Invoke-Command @cmdParams
     Write-Log -_Debug $output
     if ($LASTEXITCODE -and !$IgnoreErrors) {
-        throw "Failed to update files $WebConfigFiles"
+        throw "Failed to update files $ConfigFiles"
     }
 
 }
