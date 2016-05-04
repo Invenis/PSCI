@@ -202,9 +202,13 @@ function Deploy-SSISIspac {
                 if ($Tokens) { 
                     $variableValue = Resolve-Token -Name $variableName -Value $variableValue -ResolvedTokens $Tokens
                 }
+                $variableTypeCode = [System.TypeCode]::String   #use string values as default
+                if($variableValue -ne $null) {
+                    $variableTypeCode = $variableValue.GetTypeCode()
+                }
                 # TODO: handle sensitive variables ($false -> $true)
                 # Constructor args: variable name, typeCode, default value, sensitivity, description
-                $ssisEnvironment.Variables.Add($variableName, $variableValue.GetTypeCode(), $variableValue, $false, $variableName)
+                $ssisEnvironment.Variables.Add($variableName, $variableTypeCode, $variableValue, $false, $variableName)
             }
             $ssisEnvironment.Create()
         }
