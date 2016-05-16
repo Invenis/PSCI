@@ -66,7 +66,7 @@ function Compress-With7Zip {
     [CmdletBinding()]
     [OutputType([void])]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string[]]
         $PathsToCompress,
         
@@ -113,6 +113,10 @@ function Compress-With7Zip {
         $Quiet
     )
 
+    if (!$PathsToCompress -and !$Include) {
+        throw "At least one of parameters is required: PathsToCompress or Include."
+    }
+
     $cmdLine = New-Object System.Text.StringBuilder
 
     $7zipPath = Get-PathTo7Zip -FailIfNotFound
@@ -134,7 +138,9 @@ function Compress-With7Zip {
 
     [void]($cmdLine.Append("a $OutputFile "))
 
-    if ($PathsToCompress.Length -lt 10) {
+    if ($PathsToCompress.Length -eq 1 -and $PathsToCompress[0] -eq '*' -and $Include) {
+        #avoid overriding $Include filters with '*' wildcard
+    } elseif ($PathsToCompress.Length -lt 10) {
         $PathsToCompress = Add-QuotesToPaths $PathsToCompress
         [void]($cmdLine.Append(($PathsToCompress -join " ")))
         # Note: we should not use '-r' option as this is not standard recursion - it would instead search all <$Include> in current directory recursively
