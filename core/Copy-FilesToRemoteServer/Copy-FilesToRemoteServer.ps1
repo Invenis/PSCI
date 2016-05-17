@@ -190,7 +190,6 @@ function Copy-FilesToRemoteServer {
 
             $zipParams = @{
                 Path = $Path
-                DestinationZipPath = $Destination
                 OutputFile = $tempZip
                 Include = $Include
                 IncludeRecurse = $IncludeRecurse
@@ -199,7 +198,7 @@ function Copy-FilesToRemoteServer {
             }
 
             if (!$BlueGreenEnvVariableName -and $Path.Count -gt 1) { 
-                New-Zip @zipParams
+                New-Zip @zipParams -DestinationZipPath $Destination
                 $isStructuredZip = $true
             } else {
                 New-Zip @zipParams -Try7Zip
