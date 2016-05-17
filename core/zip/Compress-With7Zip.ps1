@@ -137,8 +137,7 @@ function Compress-With7Zip {
     $OutputFile = Add-QuotesToPaths $OutputFile
 
     [void]($cmdLine.Append("a $OutputFile "))
-
-    if ($PathsToCompress.Length -eq 1 -and $PathsToCompress[0] -eq '*' -and $Include) {
+    if (!$PathsToCompress -or ($PathsToCompress.Length -eq 1 -and $PathsToCompress[0] -eq '*' -and $Include)) {
         #avoid overriding $Include filters with '*' wildcard
     } elseif ($PathsToCompress.Length -lt 10) {
         $PathsToCompress = Add-QuotesToPaths $PathsToCompress
@@ -190,7 +189,11 @@ function Compress-With7Zip {
     }
 
     try { 
-        Write-Log -_Debug "Invoking 7zip at directory '$WorkingDirectory' ($($PathsToCompress.Count) path(s))."
+        $includes = '(None)'
+        if($Include -and $Include.Length -gt 0) {
+            $includes = $Include -join ","
+        }
+        Write-Log -_Debug "Invoking 7zip at directory '$WorkingDirectory' ($($PathsToCompress.Count) path(s)) including wildcards: $includes."
         [void](Start-ExternalProcess -Command $7zipPath -ArgumentList ($cmdLine.ToString()) -WorkingDirectory $WorkingDirectory -Quiet:$Quiet)
     } finally {
         if ($fileList -and (Test-Path -LiteralPath $fileList)) {
