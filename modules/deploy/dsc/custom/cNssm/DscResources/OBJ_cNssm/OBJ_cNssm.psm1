@@ -76,7 +76,7 @@ function Get-TargetResource {
         throw "Cannot find nssm at '$NssmPath'."
     }
 
-    if($Path -and ($Ensure -eq 'Present') -and !(Test-Path -Path $Path)) {
+    if ($Path -and $Ensure -eq 'Present' -and !(Test-Path -Path $Path)) {
         throw "Cannot find path '$Path'."
     }
 
@@ -86,14 +86,17 @@ function Get-TargetResource {
     $pathOutput = ''
     $descriptionOutput = ''
 
-    if($currentService -ne $null) {
+    if ($currentService -ne $null) {
+        $nssmServiceName = & $NssmPath get $ServiceName Application | Out-String
+        $nssmDescription = & $NssmPath get $ServiceName Description | Out-String
+        $pathOutput = Remove-WhiteSpaceChars -Text $nssmServiceName
+        $descriptionOutput = Remove-WhiteSpaceChars -Text $nssmDescription
         $additionalParametersHashtable = @{}
         foreach ($item in $AdditionalParameters)
-        {        
-            $additionalParametersHashtable[$item.Key] = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName $item.Key | Out-String)
+        {
+            $nssmAdditionalParameter = & $NssmPath get $ServiceName $item.Key | Out-String
+            $additionalParametersHashtable[$item.Key] = Remove-WhiteSpaceChars -Text $nssmAdditionalParameter
         }
-        $pathOutput = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName Application | Out-String)
-        $descriptionOutput = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName Description | Out-String)
     }
 
     $result = @{ 
@@ -163,39 +166,39 @@ function Test-TargetResource {
     
     $currentService = Get-TargetResource @PSBoundParameters
 
-    if($Ensure -eq 'Absent')
+    if ($Ensure -eq 'Absent')
     {
         return !$currentService.Ensure
     }
 
-    if($Ensure -eq 'Present')
+    if ($Ensure -eq 'Present')
     {
         if(!$currentService.Ensure)
         {
             return $false;
         }
         
-        if($ServiceDisplayName -and $currentService.ServiceDisplayName -ne $ServiceDisplayName)
+        if ($ServiceDisplayName -and $currentService.ServiceDisplayName -ne $ServiceDisplayName)
         {
             return $false;
         }
 
-        if($currentService.StartupType -ne $StartupType)
+        if ($currentService.StartupType -ne $StartupType)
         {
             return $false;
         }
 
-        if($currentService.Status -ne $Status)
+        if ($currentService.Status -ne $Status)
         {
             return $false;
         }
 
-        if($Path -and $currentService.Path -ne $Path)
+        if ($Path -and $currentService.Path -ne $Path)
         {
             return $false;
         }
 
-        if($ServiceDescription -and $currentService.ServiceDescription -ne $ServiceDescription)
+        if ($ServiceDescription -and $currentService.ServiceDescription -ne $ServiceDescription)
         {        
             return $false;
         }
