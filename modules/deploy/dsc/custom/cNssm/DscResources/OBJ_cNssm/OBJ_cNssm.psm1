@@ -62,6 +62,10 @@ function Get-TargetResource {
         [string]
         $NssmPath,
 
+        [parameter(Mandatory=$false)]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $AdditionalParameters,
+
         [Parameter(Mandatory=$false)]
         [ValidateSet('Present', 'Absent')]
         [string]
@@ -83,6 +87,11 @@ function Get-TargetResource {
     $descriptionOutput = ''
 
     if($currentService -ne $null) {
+        $additionalParametersHashtable = @{}
+        foreach ($item in $AdditionalParameters)
+        {        
+            $additionalParametersHashtable[$item.Key] = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName $item.Key | Out-String)
+        }
         $pathOutput = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName Application | Out-String)
         $descriptionOutput = Remove-WhiteSpaceChars -Text (& $NssmPath get $ServiceName Description | Out-String)
     }
@@ -96,6 +105,7 @@ function Get-TargetResource {
         Credential = $Credential
         Status = $currentService.Status
         NssmPath = $NssmPath
+        AdditionalParameters = $additionalParametersHashtable
         Ensure = $currentService -ne $null
     }
     return $result
@@ -141,6 +151,10 @@ function Test-TargetResource {
         [string]
         $NssmPath,
         
+        [parameter(Mandatory=$false)]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $AdditionalParameters,
+
         [Parameter(Mandatory=$false)]
         [ValidateSet('Present', 'Absent')]
         [string]
@@ -186,6 +200,14 @@ function Test-TargetResource {
             return $false;
         }
 
+        foreach ($item in $AdditionalParameters)
+        {            
+            if($currentService.AdditionalParameters[$item.Key] -ne $item.Value)
+            {        
+                return $false;
+            }
+        }        
+
         return $true;
     }
 }
@@ -230,6 +252,10 @@ function Set-TargetResource {
         [string]
         $NssmPath,
 
+        [parameter(Mandatory=$false)]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $AdditionalParameters,
+
         [Parameter(Mandatory=$false)]
         [ValidateSet('Present', 'Absent')]
         [string]
@@ -238,10 +264,16 @@ function Set-TargetResource {
 
     $toBeRemoved = $Ensure -eq 'Absent'
     
+    $additionalParametersHashtable = @{}
+    foreach ($item in $AdditionalParameters)
+    {
+        $additionalParametersHashtable[$item.Key] = $item.Value
+    }
+
     Write-Verbose -Message "Set-Target called"
     Set-NssmService -ServiceName $ServiceName -Path $Path -Arguments $Arguments -ServiceDisplayName $ServiceDisplayName `
         -ServiceDescription $ServiceDescription -StartupType $StartupType -Credential $Credential -Status $Status -NssmPath $NssmPath `
-        -Remove:$toBeRemoved
+        -AdditionalParameters $additionalParametersHashtable -Remove:$toBeRemoved
 }
 
 function Set-NssmService {
@@ -279,6 +311,9 @@ function Set-NssmService {
 
     .PARAMETER NssmPath
     Path to nssm.exe. If not specified, nssm.exe bundled with PSCI will be copied to Program Files and run from there.
+        
+    .PARAMETER AdditionalParameters
+    Additional parameters that will be passed to nssm.exe (nssm set <key> <value>) - see [usage](https://nssm.cc/usage).
 
     .PARAMETER Remove
     If $true, the service will be removed.
@@ -330,6 +365,10 @@ function Set-NssmService {
         [parameter(Mandatory=$true)]
         [string]
         $NssmPath,
+        
+        [parameter(Mandatory=$false)]
+        [hashtable]
+        $AdditionalParameters,
 
         [parameter(Mandatory=$false)]
         [switch]
@@ -384,6 +423,14 @@ function Set-NssmService {
         $appParams.AppParameters = $Arguments -join ' '
     }
 
+    foreach ($additionalParameter in $AdditionalParameters.GetEnumerator())
+    {
+        if(!$appParams.ContainsKey($additionalParameter.Key))
+        {
+            $appParams.Add($additionalParameter.Key, $additionalParameter.Value)            
+        }
+    }    
+
     switch ($StartupType) {
         'Automatic' { $appParams.Start = 'SERVICE_AUTO_START' }
         'Delayed' { $appParams.Start = 'SERVICE_DELAYED_START' }
@@ -391,7 +438,7 @@ function Set-NssmService {
         'Disabled' { $appParams.Start = 'SERVICE_DISABLED' }
     }
 
-    foreach ($appParam in $appParams.GetEnumerator()) {       
+    foreach ($appParam in $appParams.GetEnumerator()) {
         $nssmOutput = ''
         $nssmOutput = & $NssmPath get $ServiceName $appParam.Key | Out-String
         $value = $appParam.Value
