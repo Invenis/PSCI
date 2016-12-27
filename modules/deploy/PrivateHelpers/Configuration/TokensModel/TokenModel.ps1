@@ -7,7 +7,7 @@
 # facade - entry point that exposes API to operate on scoped tokens hierarchy
 Class TokenContainer {
 
-    EnvironmentTokens([string] $ContainerId)  {
+    TokenContainer([string] $ContainerId)  {
         $this.ContainerId = $ContainerId
     }
     
@@ -22,13 +22,14 @@ Class TokenContainer {
         return $this.Tokens.CreateInnerScope($Name)        
     }    
     
-    [void] Override([string] $TokenReference, [string] $NewValue) {
-        $override = [TokenOverride]::new($TokenReference, $NewValue)
-        $override.ApplyTo($this.Tokens)
+    [void] Override([string] $Key, [object] $NewValue) {   
+        
+        $override = [TokenOverride]::new($Key, $NewValue)
+        $override.ApplyTo($this.Tokens)        
     } 
     
-    [void] OverrideTokens([hashtable] $Overrides) {        
-        $this.Tokens.OverrideTokens($Overrides) 
+    [void] Override([hashtable] $Overrides) {        
+        $this.Tokens.Override($Overrides) 
     }      
     
     
@@ -36,10 +37,10 @@ Class TokenContainer {
         return $this.Tokens.ToHashTable()
     }     
 }
-    
+   
 
 Class TokenScope {
-
+    
     static [TokenScope] CreateRootScope() {
         return [TokenScope]::new("$", $null)
     }
@@ -57,16 +58,7 @@ Class TokenScope {
     [hashtable] $InnerScopes = @{}
     [hashtable] $Tokens = @{}
 
-    [TokenScope] CreateInnerScope([string] $Name) {        
-        $innerScope = [TokenScope]::new($Name, $this)
-        $this.InnerScopes.Add($Name, $innerScope)
-        return $innerScope
-    }
-
-    [array] GetInnerScopes() {
-        return $this.InnerScopes.Values
-    }     
-
+    
     [TokenScope] GetRootScope() {
         $result = $this
         
@@ -75,44 +67,126 @@ Class TokenScope {
         return $result
     }
 
-    [Token] AddToken([string] $Name, [object] $Value) {
+    [array] GetInnerScopes() {
+        return $this.InnerScopes.Values
+    } 
 
-        $tokenFullName = "$($this.FullName).$Name"
-        $token = [Token]::new($tokenFullName, $Value)
+    [TokenScope] GetScope([ItemPath] $Path) {
+        $innerScopeName = $Path.GetRootItemName()
+        $subpath = $Path.ToSubpath()
+
+        $nextScope = if ($Path.IsRelative()) { $this.InnerScopes[$innerScopeName] } else { $this.GetRootScope() }
+
+        if ($subpath -and $nextScope) {
+            return $nextScope.GetScope($subpath)
+        } else {
+            return $nextScope
+        }
+    }
+
+    [TokenScope] EnsureScope([string] $Path) {                                
+        return $this.EnsureScope([ItemPath]::new($Path))
+    }
+
+    [TokenScope] EnsureScope([ItemPath] $Path) {                        
+        
+        $innerScopeName = $Path.GetRootItemName()
+        $subpath = $Path.ToSubpath()
+
+        $scope = 
+            if ($Path.IsRelative()) { 
+                if ($this.InnerScopes.ContainsKey($innerScopeName)) { 
+                    $this.InnerScopes[$innerScopeName] 
+                } else { 
+                    $this.CreateInnerScope($innerScopeName) 
+                }
+            } else { 
+                $this.GetRootScope() 
+            }
+
+        if ($subpath) {
+            $scope = $scope.EnsureScope($subpath)
+        }
+
+        return $scope
+    }
+
+    [TokenScope] CreateInnerScope([string] $Name) {        
+        $innerScope = [TokenScope]::new($Name, $this)
+        $this.InnerScopes.Add($Name, $innerScope)
+        return $innerScope
+    }  
+    
+    [Token] GetToken([ItemPath] $Path) {                   
+        $scopePath = $Path.ToBasePath()
+        $tokenName = $Path.GetTargetItemName()
+        
+        if ($scopePath) { 
+            $scope = $this.GetScope($scopePath)
+            if ($scope) {
+                return $scope.GetToken($tokenName)
+            } else {
+                return $null
+            }            
+        } else { 
+            return $this.Tokens[$tokenName]
+        }  
+    }
+            
+    [bool] TokenExists([ItemPath] $Path) {
+        return $this.GetToken($Path) -ne $null
+    }         
+
+    [Token] AddToken([string] $Name, [object] $Value) {
+        
+        $token = [Token]::new($this.FullName, $Name, $Value)
         $this.Tokens.Add($Name, $token)
         return $token
     }
 
-    [Token] GetToken([TokenPath] $RelativePath) {                   
-        return $RelativePath.GetToken($this)
-    }
-            
-    [bool] TokenExists([TokenPath] $RelativePath) {
-        return $RelativePath.Exists($this)
+    [Token] CreateToken([ItemPath] $Path) {
+        return $this.CreateToken($Path, $null)
     }
 
-    [void] OverrideTokens([hashtable] $overrides) {
+    [Token] CreateToken([ItemPath] $Path, [object] $Value) {
+        
+        $tokenName = $Path.GetTargetItemName()
+        $scopePath = $Path.ToBasePath()
+        $targetScope = if ($scopePath) { $this.EnsureScope($scopePath) } else { $this }
+
+        return $targetScope.AddToken($tokenName, $Value)
+    }
+
+    [void] Override([string] $TokenName, [object] $NewValue) {
+            
+        if ([ValueReferencePlaceholder]::IsValidPlaceholderSyntax($TokenName)) {
+            $reference = [ValueReferencePlaceholder]::TryExtractReference($TokenName)
+            $reference.TrySetValue($this, $NewValue)
+        } else {
+            if ($this.Tokens.ContainsKey($TokenName)) {
+                $this.Tokens[$TokenName].UpdateValue($newValue)
+            } else {
+                $this.AddToken($TokenName, $newValue)
+            }
+        }         
+    } 
+
+    [void] Override([hashtable] $overrides) {
+
+        if (-not $overrides) {
+            return
+        }
         
         $overrides.Keys | ForEach {            
             
             $overridenKey = $_
             $newValue = $overrides[$overridenKey]
 
-            if ($newValue -is [hashtable]) {
-                
-                if (-not $this.InnerScopes.ContainsKey($overridenKey)) {
-                    $this.CreateInnerScope($overridenKey)
-                }
-
-                $this.InnerScopes[$overridenKey].Override($newValue)
-                
-            } else { # override token - create new or override existing value
-                
-                if ($this.Tokens.ContainsKey($overridenKey)) {
-                    $this.Tokens[$overridenKey].OverrideValue($newValue)
-                } else {
-                    $this.AddToken($overridenKey, $newValue)
-                }
+            if ($newValue -is [hashtable]) {                
+                $innerScope = $this.EnsureScope($overridenKey)                
+                $innerScope.Override($newValue)              
+            } else {         
+                $this.Override($overridenKey, $newValue)  
             }
         }
     }
@@ -122,7 +196,7 @@ Class TokenScope {
         $result = @{}
 
         $this.InnerScopes.Values | ForEach { $result.Add($_.Name, $_.ToHashTable()) }
-        $this.Tokens.Values | ForEach { $result.Add($_.FullName, $_.RawValue) }
+        $this.Tokens.Values | ForEach { $result.Add($_.Name, $_.RawValue) }
         
         return $result         
     } 
@@ -131,11 +205,22 @@ Class TokenScope {
 
 Class Token {
 
-    Token($FullName, $RawValue) {
-        $this.FullName = $FullName
+    Token($ScopeFullName, $Name, $RawValue) {
+        
+        if ([string]::IsNullOrWhiteSpace($ScopeFullName)) {
+            throw "Argument ScopeFullName can not be empty string"
+        }
+
+        if ([string]::IsNullOrWhiteSpace($Name)) {
+            throw "Argument Name can not be empty string"
+        }
+
+        $this.Name = $Name
+        $this.FullName = "$ScopeFullName.$Name"
         $this.RawValue = $RawValue
     }
 
+    [string] $Name
     [string] $FullName
     [object] $RawValue
 
@@ -164,51 +249,108 @@ Class Token {
     }
 }
 
+
+Class ValueReferencePlaceholder {
+    [regex] static $PlaceholderPattern = "\$\{(?<reference>.+)\}"
+
+    [bool] static IsValidPlaceholderSyntax([string] $Value) {
+        return $Value -match [ValueReferencePlaceholder]::PlaceholderPattern
+    }
+
+    [ValueReference] static TryExtractReference([string] $Placeholder) {
+        if ($Placeholder -match [ValueReferencePlaceholder]::PlaceholderPattern) {
+            return [ValueReference]::new($Matches["reference"])
+        } else {
+            return $null
+        }
+    }
+}
+
+
+# reference is token path + optional expression accessing token type specific member
+# if token is object, then reference can contain "=>" to access object property e.g. SomeScope.SomeObjectTypeToken=>ObjectProperty    
+class ValueReference {
+    
+    [regex] static $Pattern = "^(?<tokenPath>$([ItemPath]::Pattern))(?<tokenMemberExpression>(=>)?.*)$" 
+
+    ValueReference([string] $Reference) {
+
+        if ($Reference -match [ValueReference]::Pattern) {
+            $this.TokenPath = [ItemPath]::new($Matches["tokenPath"])
+            $this.TokenMemberExpression = [ValueReference]::ParseTokenMemberExpression($Matches["tokenMemberExpression"])            
+        } else {
+            throw "Unrecognized token override syntax: $Reference"
+        }  
+    }
+
+    [ItemPath] $TokenPath
+    [string] $TokenMemberExpression
+    
+    static [string] ParseTokenMemberExpression([string] $expression) {
+
+        if (!$expression) {
+            return $null
+        }
+
+        $isObjectMemberAccess = $expression.StartsWith("=>")
+
+        if ($isObjectMemberAccess) {
+            $expression = ".$($expression.Substring(2))"
+        }
+
+        return $expression        
+    }
+
+    [bool] TrySetValue([TokenScope] $Context, [object] $NewValue) {
+
+        $referencedToken = $Context.GetToken($this.TokenPath)
+
+        if ($referencedToken) {           
+            $referencedToken.UpdateValue($NewValue, $this.TokenMemberExpression)   
+            return $true    
+        } else {
+            return $false
+        }           
+    }
+
+    [ValueReference] UpdateTokenPath([ItemPath] $Path) {
+        $reference = [ValueReference]::new($Path)
+        $reference.TokenMemberExpression = $this.TokenMemberExpression
+        return $reference 
+    }
+}
+
+
 class TokenOverride {       
 
-    TokenOverride([string] $Reference, [string] $Value) {
+    TokenOverride([string] $Key, [object] $NewValue) {
 
-        $this.Value = [TokenOverride]::Parse($Value)
-               
-        # TODO: token reference concept may deserve for a dedicated, simple class which
-        # will take away all details of playing with plain string in here
-        if ($Reference -match [TokenOverride]::ReferencePattern) {
-            $this.TokenPath = [TokenPath]::new($Matches["tokenPath"])
-            $this.IsObjectMemberAccess = $Matches["objectMemberAccess"]
-            $this.TokenMemberExpression = $Matches["tokenMemberExpression"]
-        } else {
-            throw "Unrecognized TokenOverride syntax: $Reference = $Value"
-        }                  
-    }
+        $this.NewValue = [TokenOverride]::ParseValue($NewValue)
+        $this.ValueReference = [ValueReference]::new($Key)                
+    }  
+    
+    [ValueReference] $ValueReference
+    [object] $NewValue
 
-    # reference is token path + optional expression accessing token type specific member
-    # if token is object, then reference can contain "=>" to access object property e.g. SomeScope.SomeObjectTypeToken=>ObjectProperty    
-    [string] static $ReferencePattern = "^(?<tokenPath>[\w-]+(\.[\w-]+)*)(<objectMemberAccess>\=>)?(?<tokenMemberExpression>.*)"
-
-    [TokenPath] $TokenPath
-    [bool] $IsObjectMemberAccess
-    [string] $TokenMemberExpression
-    [object] $Value
-
-    [bool] static IsValidTokenReferenceSyntax([string] $Reference) {
-        return $Reference -match [TokenOverride]::ReferencePattern
-    }
-
-    static [object] Parse($Value) {
+    static [object] ParseValue($Value) {
+        
         if (!$Value) {
             return $Value
         }
 
-        if ($Value -ieq '$true') {
-            return $true
-        }
+        if ($Value -is [string]) {
 
-        if ($Value -ieq '$false') {
-            return $false
-        }
+            if ($Value -ieq '$true') {
+                return $true
+            }
 
-        if ($Value -match '^{\s+.+\s+}$') {
-            return [ScriptBlock]::Create($Value)
+            if ($Value -ieq '$false') {
+                return $false
+            }
+
+            if ($Value -match '^{\s+.+\s+}$') {
+                return [ScriptBlock]::Create($Value)
+            }
         }
     
         return $Value 
@@ -216,98 +358,98 @@ class TokenOverride {
 
     [void] ApplyTo([TokenScope] $Context) {
 
-        $targetTokens = $this.LookupTokensToOverride($Context)
+        $overriddenTokens = $this.LookupOverridenTokens($Context)
 
-        if ($targetTokens.Count) {
-            $targetTokens | ForEach { $_.UpdateValue($this.Value) }
+        if ($overriddenTokens.Count) {
+            $overriddenTokens | ForEach {
+                $reference = $this.ValueReference.UpdateTokenPath($_.FullName)
+                $reference.TrySetValue($Context, $this.NewValue) 
+            }
         } else {
-            Write-Warning "Could not override token '$($this.TokenPath.FullPath)'. Token has not been found."
-        }        
+            Write-Warning "Could not override token '$($this.ValueReference.TokenPath.ToString())' in scope of '$($Context.FullName)'. Token has not been found."
+        }
     }
 
-    [array] LookupTokensToOverride([TokenScope] $Context) {
-
-        $lookup = [InnerScopeTokenLookup]::new($this.TokenPath)
+    [array] LookupOverridenTokens([TokenScope] $Context) {
+        $lookup = [InnerScopeTokenLookup]::new($this.ValueReference.TokenPath)
         return $lookup.GetTokens($Context)
     }
 }
 
 
-Class ScopePath {
-
-    ScopePath([string] $Path) {   
+Class Identifier {
     
-        #todo: validate path syntax 
-         
-        $this.ScopeNames = if ([string]::IsNullOrEmpty($Path)) { @() } else { $Path.Split(".") }
-    }
-
-    static [string] $RootScopeName = "$"        
-    [array] $ScopeNames
-
-    [bool] IsRelative() {
-        return ($this.ScopeNames | Select -First 1) -ne [ScopePath]::RootScopeName
-    }
-
-    [bool] Exists([TokenScope] $Context) {
-        return $this.GetTargetScope($Context) -ne $null
-    }
-        
-    [TokenScope] GetTargetScope([TokenScope] $Context) {
-        $targetScope = $Context
-
-        $this.ScopeNames | ?{$_} | ForEach { 
-                $targetScope = if ($targetScope) { 
-                        if ($_ -eq $this.RootScopeName) { $Context.GetRootScope() } else { $targetScope.InnerScopes[$_] }                        
-                    } else { 
-                        $null 
-                    } 
-            }
-                
-        return $targetScope    
+    static [string] $Pattern = "((?<identifier>[\w-$]+)|\[(?<identifier>[^\[^\]]+)\])"    
+    
+    static [string] Parse([string] $Value) {
+        if ($Value -match "^$([Identifier]::Pattern)$") {
+            return $Matches["identifier"]
+        } else {
+            throw "Invalid identifier '$Value'"
+        }
     }
 }
 
 
-Class TokenPath {
+Class ItemPath {
 
-    TokenPath([string] $Path) {     
+    static [string] $PathSeparator = "."
+    static [string] $Pattern = "($([Identifier]::Pattern)\.)*$([Identifier]::Pattern)"
+    static [regex] $PatternRegex = "^$([ItemPath]::Pattern)$"
+    static [string] $RootScopeName = "$" 
 
-        #todo: validate path syntax                
-
-        if ($Path.Contains(".")) { # complex path - at least one "." separator
-            $tokenNameSeparatorIndex = $Path.LastIndexOf(".")
-            $this.TokenName = $Path.Substring($tokenNameSeparatorIndex+1)        
-            $this.ScopePath = [ScopePath]::new($Path.Substring(0, $tokenNameSeparatorIndex))
-        } else { # path is simple token name
-            $this.TokenName = $Path  
-            $this.ScopePath = [ScopePath]::new("")          
-        }
-
-        $this.FullPath = $Path
+    ItemPath([string] $Path) {        
+        $this.Identifiers = [ItemPath]::Split($Path)        
     }
 
-    [string] $FullPath
-    [string] $TokenName
-    [ScopePath] $ScopePath
+    ItemPath([array] $Identifiers) {   
+     
+        if ($Identifiers.Count -eq 0) {
+            throw "Item path must contain at least one identifier"
+        }
+        
+        $this.Identifiers = $Identifiers                      
+    }
+    
+    [array] $Identifiers
+    
+    static [array] Split([string] $Path) {        
+        
+        $match = [ItemPath]::PatternRegex.Match($Path)
+        
+        if ($match.Success) {
+            return $match.Groups["identifier"].Captures.Value
+        } else {
+            throw "Invalid syntax of item path: '$Path'"
+        }
+    }
 
     [bool] IsRelative() {
-        return $this.ScopePath.IsRelative()
+        return ($this.Identifiers[0] -ne [ItemPath]::RootScopeName)
+    }    
+
+    [ItemPath] ToSubpath() {
+        $innerIdentifiers = $this.Identifiers | Select -Skip 1
+        $subpath = if ($innerIdentifiers.Count -eq 0) { $null } else { [ItemPath]::new($innerIdentifiers) }        
+        return $subpath
     }
 
-    [bool] Exists([TokenScope] $SearchRootScope) {
-        return $this.GetToken($SearchRootScope) -ne $null
+    [ItemPath] ToBasePath() {
+        $baseIdentifiers = $this.Identifiers | Select -SkipLast 1
+        $basePath = if ($baseIdentifiers.Count -eq 0) { $null } else { [ItemPath]::new($baseIdentifiers) }
+        return $basePath
+    }
+    
+    [string] GetRootItemName() {
+        return $this.Identifiers | Select -First 1
     }
 
-    [Token] GetToken([TokenScope] $SearchRootScope) { 
-        
-        $targetScope = $this.ScopePath.GetTargetScope($SearchRootScope)
+    [string] GetTargetItemName() {
+        return $this.Identifiers[$this.Identifiers.Count-1]
+    }
 
-        if ($targetScope) { 
-            return $targetScope.Tokens[$This.TokenName] 
-        } else { 
-            return $null
-        }
+    [string] ToString() {
+        return $this.Identifiers -join [ItemPath]::PathSeparator
     }
 }
 
@@ -325,14 +467,14 @@ Class TokenLookup {
 Class InnerScopeTokenLookup : TokenLookup {
 
     InnerScopeTokenLookup([string] $Path) {
-        $this.Path = [TokenPath]::new($Path)
+        $this.Path = [ItemPath]::new($Path)
     }
 
-    InnerScopeTokenLookup([TokenPath] $Path) {
+    InnerScopeTokenLookup([ItemPath] $Path) {
         $this.Path = $Path
     }
 
-    [TokenPath] $Path
+    [ItemPath] $Path
 
     [array] GetTokens([TokenScope] $Context) {
     
@@ -349,88 +491,5 @@ Class InnerScopeTokenLookup : TokenLookup {
         }  
         
         return $result      
-    }
-}
-
-
-# UNIT TESTS
-
-
-
-Describe “TokenPath" {
-
-
-    It "create simple path" {
-
-        $path = [TokenPath]::new("Token1")
-
-        $path.TokenName | Should Be "Token1"
-        $path.ScopePath | Should Not Be $null
-    }
-
-    It "create multipart path" {
-
-        $path = [TokenPath]::new("RootCategory.S1.S2.S3.S4.S5.Token1")
-
-        $path.TokenName | Should Be "Token1"
-        $path.ScopePath | Should Not Be $null
-    }
-
-    It "IsRelative for simple path" {
-
-        $path = [TokenPath]::new("Token1")
-
-        $path.IsRelative() | Should Be $true        
-    }
-
-    It "IsRelative for simple path starting with $" {
-
-        $path = [TokenPath]::new('$Token1')
-
-        $path.IsRelative() | Should Be $true        
-    }
-
-    It "NOT IsRelative for simple rooted path" {
-
-        $path = [TokenPath]::new("$.Token1")
-
-        $path.IsRelative() | Should Be $false        
-    }
-
-}
-
-
-Describe “TokenOverride" {
-
-
-    Context "ApplyTo nested tokens hierarchy" {
-       
-        $rootScope = [TokenScope]::CreateRootScope()
-        $portToken = $rootScope.CreateInnerScope("WebAPI").CreateInnerScope("Binding").AddToken("Port", 80) 
-        
-        Mock Write-Warning {}  
-
-        It "replaces existing token value" {
-
-            $override = [TokenOverride]::new("WebAPI.Binding.Port", 443)
-            
-            $override.ApplyTo($rootScope)
-
-            $portToken.RawValue | Should Be 443
-        }
-
-        It "does not throw when token does not exist" {
-
-            $override = [TokenOverride]::new("WebAPI.Binding.Protocol", "https")
-            
-            { $override.ApplyTo($rootScope) } | Should Not Throw            
-        }
-
-        It "write warnings when token does not exist" {
-
-            $override = [TokenOverride]::new("WebAPI.Binding.Protocol", "https")
-            
-            Assert-MockCalled Write-Warning -Times 1          
-        }
     }
 }

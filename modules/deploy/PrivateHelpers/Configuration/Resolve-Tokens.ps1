@@ -117,18 +117,26 @@ function Resolve-Tokens {
         $TokensOverride
     )
 
-    $resolvedTokens = @{}
+    $envTokens = [TokenContainer]::new("Default")
 
     $envHierarchy = Resolve-BasedOnHierarchy -AllElements $AllEnvironments -SelectedElement $Environment -ConfigElementName 'Environment'
 
     # get tokens from specific environments
     foreach ($env in $envHierarchy) {
-        Resolve-TokensForEnvironment -Tokens $AllEnvironments[$env].Tokens -ResolvedTokens $resolvedTokens -TokensOverride $TokensOverride
+        $envTokens.Override($AllEnvironments[$env].Tokens)
+
         $tokensChildren = $AllEnvironments[$env].TokensChildren
         if ($tokensChildren.ContainsKey($node)) {
-            Resolve-TokensForEnvironment -Tokens $tokensChildren[$node] -ResolvedTokens $resolvedTokens -TokensOverride $TokensOverride
+            $envTokens.Override($tokensChildren[$node])
         }
     }
+
+    if ($TokensOverride) {
+        $TokensOverride.Keys | ForEach { $envTokens.Override($_, $TokensOverride[$_]) }
+    }
+    
+
+    $resolvedTokens = $envTokens.ToHashTable()
 
     # add 'node' and 'environment'
     if (!$resolvedTokens.ContainsKey('Common')) {
