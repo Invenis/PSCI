@@ -22,20 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 #>
 
-function ConvertTo-Integer {
+function ConvertTo-Decimal {
     <#
     .SYNOPSIS
-    Converts string to int or $null if conversion fails.
+    Converts string to decimal or $null if conversion fails.
     
     .PARAMETER Value
     String to convert.
 
     .EXAMPLE
-    ConvertTo-Integer -Value '3'
+    ConvertTo-Decimal -Value '3.0'
     #>   
      
     [CmdletBinding()]
-    [OutputType([int])]
+    [OutputType([decimal])]
     param(
         [Parameter(Mandatory=$false)]
         [string] 
@@ -45,8 +45,8 @@ function ConvertTo-Integer {
     if (!$Value) {
         return $null
     }
-    $out = 0
-    $result = [System.Int32]::TryParse($value, [ref]$out)
+    $out = [decimal]0.0
+    $result = [System.Decimal]::TryParse($value, [ref]$out)
     if (!$result) {
         return $null
     }

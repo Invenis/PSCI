@@ -79,7 +79,7 @@ function Build-EntityFrameworkMigratePackage {
         [string]
         $PackageName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]
         $MigrationsDir,
 
@@ -125,6 +125,22 @@ function Build-EntityFrameworkMigratePackage {
                             -Path $ProjectPath `
                             -ErrorMsg "Project file {0} specified in 'ProjectPath' argument does not exist (package '$PackageName'). Tried following absolute path: '{0}'."
     }
+        
+    if (![string]::IsNullOrEmpty($ProjectPath)){
+        if ($RestoreNuGet) {
+            Write-Log -Info "Restoring nuget packages for package '$PackageName'." -Emphasize
+            Start-NugetRestore -ProjectPath $ProjectPath
+        }
+        Invoke-MsBuild -ProjectPath $ProjectPath -MsBuildOptions $MsBuildOptions -LogExternalMessage:$false
+    }
+
+    # if we build project from $ProjectPath then we should use build output from that project instead of $MigrationsDir that is provided explicitly as another parameter
+    # TODO: $MigrationsDir should be removed, $ProjectPath should be made mandatory so that project is alawys built and only its output is used to build migration package
+    #       $MigrationsDir is left for backward compatibility.
+    if (![string]::IsNullOrEmpty($ProjectPath) -and [string]::IsNullOrEmpty($MigrationsDir)) {
+        $MigrationsDir = "$(Split-Path -Path $ProjectPath)\bin\$($MsBuildOptions.Configuration)"
+    }
+
     $MigrationsDir = Resolve-PathRelativeToProjectRoot `
                         -Path $MigrationsDir `
                         -ErrorMsg "Directory that should contain migration dlls '$migrationsDir' does not exist (package '$PackageName'). Tried following absolute path: '{0}'."
@@ -139,10 +155,6 @@ function Build-EntityFrameworkMigratePackage {
                             -Path $OutputPath `
                             -DefaultPath (Join-Path -Path $configPaths.PackagesPath -ChildPath $PackageName) `
                             -CheckExistence:$false
-
-    if (![string]::IsNullOrEmpty($ProjectPath) -and !(Test-Path -LiteralPath $ProjectPath)) {
-        throw "Given project file '$ProjectPath' does not exist for '$PackageName'."
-    }
 
     if ($OutputPath.ToLower().EndsWith('zip')) {
         $zipPath = $OutputPath
@@ -179,14 +191,6 @@ function Build-EntityFrameworkMigratePackage {
         foreach ($addFileToPackage in $AddFilesToPackage.GetEnumerator()) {
             $resolvedAddFilesToPackage += Resolve-PathRelativeToProjectRoot -Path ($addFileToPackage.Value) -ErrorMsg "Additional file to package '$addFileToPackage' does not exist (package '$packageName')."
         }
-    }
-
-    if (![string]::IsNullOrEmpty($ProjectPath)){
-        if ($RestoreNuGet) {
-            Write-Log -Info "Restoring nuget packages for package '$PackageName'." -Emphasize
-            Start-NugetRestore -ProjectPath $ProjectPath
-        }
-        Invoke-MsBuild -ProjectPath $ProjectPath -MsBuildOptions $MsBuildOptions -LogExternalMessage:$false
     }
 
     if (!$MigrationsFileWildcard) {
