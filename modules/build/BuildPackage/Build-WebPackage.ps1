@@ -111,16 +111,18 @@ function Build-WebPackage {
                             -Path $OutputPath `
                             -DefaultPath (Join-Path -Path (Join-Path -Path $configPaths.PackagesPath -ChildPath $PackageName) -ChildPath "${packageNameLeaf}.zip") `
                             -CheckExistence:$false
-    
+
     [void]($params.Remove('AutoParameterizeConnectionStrings'))
 
-    $params.MsBuildPackageOptions = @{ 
+    $params.MsBuildPackageOptions = @{
         "DeployOnBuild" = "True"
         "DeployTarget" = "Package"
         "PackageLocation" = $OutputPath
+        "Version" = $Version
+        "AssemblyInfoFilePaths" = $AssemblyInfoFilePaths
         "AutoParameterizationWebConfigConnectionStrings" = $AutoParameterizeConnectionStrings.ToString().ToLowerInvariant()
     }
-   
+
     Build-MSBuild @params
 
     if (!(Test-Path -LiteralPath $OutputPath)) {
