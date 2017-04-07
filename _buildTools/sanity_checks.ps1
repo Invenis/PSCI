@@ -49,7 +49,7 @@ SOFTWARE.
 "@ -replace "`r`n", "`n" -replace "`n", [Environment]::NewLine
 
 # we additionally accept different years
-$licenseTexts = @($licenseText, ($licenseText -replace '2015', '2016'))
+$licenseTexts = @($licenseText, ($licenseText -replace '2015', '2016', '2017'))
 
 $customSources = Get-ChildItem -Path "$PSScriptRoot\.." -File -Filter "*.ps*1" -Recurse | 
                  Select-Object -ExpandProperty FullName |
