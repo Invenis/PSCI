@@ -186,8 +186,6 @@ function Enable-Remoting {
         [void](Enable-WSManCredSSP -Role Client -DelegateComputer $CredSSPClientDelegateComputer -Force)
     }
 
-    Test-PSRemoting -AuthTypes $AuthTypes -Protocols $Protocols -ComputerName $CertSubjectName
-
 }
 
 function Set-RenewedSelfSignedCertificate {
