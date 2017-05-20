@@ -4,7 +4,7 @@ Properties {
 }
 
 # Common variables
-$ProjectRoot = $ENV:BHProjectPath
+$ProjectRoot = $ENV:BHModulePath
 if (-not $ProjectRoot) {
     $ProjectRoot = Split-Path -Parent $PSScriptRoot
 }
