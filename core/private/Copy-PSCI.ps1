@@ -69,7 +69,7 @@ function Copy-PSCI {
     $dscExclude = @('Docs', 'Examples', 'Samples')
 
     # PSCI.deploy is a separate case (need to filter out unused dsc)
-    $mustHaveModules = @('PSCI.core')
+    $mustHaveModules = @('PSCI.core', 'PPoShTools', 'PPoShSqlTools')
     $modules = @($ModulesToInclude) + $mustHaveModules | Where-Object { $_ -ine 'PSCI.deploy' } | Select-Object -Unique 
     $mustHaveExternalLibs = @('Carbon\Carbon\bin', 'Carbon\Carbon\Path', 'Carbon\Carbon\Xml')
     $externalLibs = @($ExternalLibsToInclude) + $mustHaveExternalLibs + ($configInfo.RequiredExternalLibs) | Select-Object -Unique

@@ -50,15 +50,18 @@ $importedPsciModules = Get-Module | Where-Object { $_.Name.StartsWith('PSCI') }
 if ($importedPsciModules) { 
     Remove-Module -Name $importedPsciModules.Name -Force -ErrorAction SilentlyContinue
 }
-
 $curDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-. "$curDir\PSCI.classes.ps1"
+
+$baseModules = Get-ChildItem -Path "$curDir\baseModules\*\*\*.psd1"
+foreach ($baseModule in $baseModules) {
+    Import-Module -Name $baseModule.FullName
+}
+
+$Script:LogConfiguration.LogLevel = [LogLevel]::Debug
 . "$curDir\PSCI.globalObjects.ps1"
 
 # 3>$null suppresses warning messages (appearing due to usage of unapproved verbs)
 Import-Module -Name "$curDir\core\PSCI.core.psd1" -Force -Global 3>$null
-
-$buildNumber = Get-PSCIBuildNumber -Path $curDir
 
 if (Test-Path -LiteralPath "$curDir\modules") {
     $modulesToImport = Get-ChildItem -Path "$curDir\modules\*\*.psd1" | Where-Object { !$PSBoundParameters.ContainsKey('Submodules') -or $Submodules -icontains $_.BaseName }
@@ -68,13 +71,11 @@ if (Test-Path -LiteralPath "$curDir\modules") {
             Import-Module -Name $modulePath -Force -Global 3>$null
         }
         $moduleNames = ($modulesToImport.Name -replace 'PSCI.(.*).psd1', '$1' -join ', ') 
-        Write-Log -Info ("PSCI (build #{0}) started with modules: {1}. Path: '{2}'." -f $buildNumber, $moduleNames, $PSScriptRoot)
+        Write-Log -Info ("PSCI started with modules: {0}. Path: '{1}'." -f $moduleNames, $PSScriptRoot)
     } else {
-        Write-Log -Info ("PSCI (build #{0}) started with no modules. Path: '{1}'." -f $buildNumber, $PSScriptRoot)
+        Write-Log -Info ("PSCI started with no modules. Path: '{0}'." -f $PSScriptRoot)
     }
 }
 
 Export-ModuleMember -Variable `
-    PSCIGlobalConfiguration, `
-    LogSeverity
-
+    PSCIGlobalConfiguration

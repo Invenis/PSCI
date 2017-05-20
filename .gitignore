@@ -1,4 +1,5 @@
 bin/
+baseModules/
 build.log.txt
 deploy.log.txt
 deploy_*.txt

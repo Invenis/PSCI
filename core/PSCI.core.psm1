@@ -32,9 +32,7 @@ Get-ChildItem -Recurse $curDir -Include *.ps1 | Where-Object { $_ -notmatch '\.T
 }
 
 $publicFunctions += @(
-    'Build-DeploymentScriptsPackage',
-    'Copy-FilesFromRemoteServer',
-    'Copy-FilesToRemoteServer'
+    'Build-DeploymentScriptsPackage'
 )
 
 Export-ModuleMember -Function $publicFunctions

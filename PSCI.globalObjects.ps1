@@ -23,24 +23,6 @@ SOFTWARE.
 #>
 
 $Global:PSCIGlobalConfiguration = [PSCustomObject]@{
-    # Logging level threshold - available values: DEBUG, INFO, WARN, ERROR, CRITICAL
-    LogLevel = [PSCI.LogSeverity]::DEBUG;
-
-    # Path to file log or $null if shouldn't log to file. 
-    LogFile = $null;
-
-    # Name of Event Log Source to log to or $null if shouldn't log to Event Log.
-    LogEventLogSource = $null;         
-
-    # Logging level threshold for Event Log - available values: DEBUG, INFO, WARN, ERROR, CRITICAL. 
-    # This would normally have higher threshold than LogLevel.
-    LogEventLogThreshold = [PSCI.LogSeverity]::ERROR; 
-
-    # If true and Event Log Source specified in LogEventLogSource is not available,
-    # it will be created automatically.
-    # Note: Event Log Source creation requires Administrative privileges
-    LogEventLogCreateSourceIfNotExists = $false;
-
     # If $null then it means that script is executed on the current machine (without remoting)
     # PSRemoting - means script is executed remotely using psremoting mechanism
     # WebDeployHandler - means script is executed remotely using web deployment hanlder (IIS handler)

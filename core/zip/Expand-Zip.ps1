@@ -73,7 +73,11 @@ function Expand-Zip {
             }
             $7zipPath = '"{0}"' -f $7zipPath
             $cmdLine =  " x `"$ArchiveFile`" -o`"$OutputDirectory`" -y"
-            . $env:ComSpec /C """$7zipPath $cmdLine"""
+            if ($PSVersionTable.PSVersion.Major -gt 4) {
+                . $env:ComSpec /C "$7zipPath $cmdLine"
+            } else { 
+                . $env:ComSpec /C """$7zipPath $cmdLine""" 
+            }
             if (!$LASTEXITCODE) {
                 return
             } else {

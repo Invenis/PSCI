@@ -35,7 +35,7 @@ Task Test -Depends Init  {
         "$ProjectRoot\modules\deploy\PublicHelpers",
         "$ProjectRoot\modules\deploy\PrivateHelpers",
         "$ProjectRoot\modules\deploy\DeployPackage"
-    )
+    ) | Where-Object { Test-Path $_ }
 
     $TestResults = Invoke-Pester -Path $paths -PassThru -OutputFormat NUnitXml `
         -OutputFile "$ProjectRoot\Test.xml" -Strict -Tag $TestTags

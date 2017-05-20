@@ -27,7 +27,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 Describe -Tag "PSCI.unit" "Get-UpdateXmlUsingXPathParams" {
     InModuleScope PSCI.deploy {
 
-        $testFileName = 'Get-UpdateXmlUsingXPathParams.Test'
+        $testFileName = "$PSScriptRoot\Get-UpdateXmlUsingXPathParams.Test"
 
         function New-TestFile {
             Set-Content -Path $testFileName -Value @'

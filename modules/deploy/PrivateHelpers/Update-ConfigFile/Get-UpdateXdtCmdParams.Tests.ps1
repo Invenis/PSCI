@@ -22,12 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 #>
 
-Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
+Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Get-UpdateXdtCmdParams" {
     InModuleScope PSCI.deploy {
 
-        $testFileName = 'Get-UpdateXdtCmdParams.test'
+        $testFileName = "$PSScriptRoot\Get-UpdateXdtCmdParams.test"
 
         function New-TestFile {
             Set-Content -Path $testFileName -Value @'
@@ -73,7 +73,6 @@ Describe -Tag "PSCI.unit" "Get-UpdateXdtCmdParams" {
 </configuration>
 
 '@
-
                 } finally {
                     Remove-Item -LiteralPath $testFileName -Force -ErrorAction SilentlyContinue
                 }

@@ -76,7 +76,7 @@ Describe -Tag "PSCI.unit" "Install-DscResources" {
             Install-DscResources -ModuleNames $moduleNames
 
             It "should copy modules" {
-                Test-Path -LiteralPath $expectedDst | Should Be $true
+                Test-Path -LiteralPath $expectedDst | Should Be @($true, $true, $true)
             }
 
             It "should not copy Examples directory" {
@@ -94,7 +94,7 @@ Describe -Tag "PSCI.unit" "Install-DscResources" {
             Install-DscResources -ModuleNames $moduleNames
 
             It "should copy modules" {
-                Test-Path -LiteralPath $expectedDst | Should Be $true
+                Test-Path -LiteralPath $expectedDst | Should Be @($true, $true, $true)
             }
 
             It "should not copy Examples directory" {

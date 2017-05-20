@@ -22,22 +22,10 @@ else {
     "Using PSDepend $($psDepend.Version)"
 }
 
-### Install build dependencies if required
-$dependencies = Get-Dependency
-$needInvokePSDepend = !$dependencies
-foreach ($dep in $dependencies) {
-    $moduleVersions = Get-Module -Name $dep.DependencyName -ListAvailable | `
-        Select-Object -ExpandProperty Version | `
-        Foreach-Object { "$($_.Major).$($_.Minor).$($_.Build)" }
-    if (!($moduleVersions -contains $dep.Version)) {
-        $needInvokePSDepend = $true
-        break
-    }
-}
-if ($needInvokePSDepend) { 
-    "Installing build dependencies"
-    Invoke-PSDepend -Force -Verbose
-}
+"Installing build dependencies"
+#Invoke-PSDepend -Path "$PSScriptRoot\build.depend.psd1" -Force -Verbose
+"Installing project dependencies"
+#Invoke-PSDepend -Path "$PSScriptRoot\psci.depend.psd1" -Target "$PSScriptRoot\..\baseModules" -Force -Verbose
 
 ### Run psake
 "Setting build environment"

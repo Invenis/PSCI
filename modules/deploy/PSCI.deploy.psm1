@@ -33,4 +33,7 @@ Get-ChildItem -Recurse $curDir -Include *.ps1 | Where-Object { $_ -notmatch '\.T
      
 }
 
+
+Set-Alias Update-SqlLogin New-SqlLogin
+Set-Alias Update-SqlUser New-SqlUser
 Export-ModuleMember -Function $publicFunctions

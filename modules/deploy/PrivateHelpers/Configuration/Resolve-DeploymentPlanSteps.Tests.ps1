@@ -52,7 +52,7 @@ Describe -Tag "PSCI.unit" "Resolve-DeploymentPlanSteps" {
         }
 
         Configuration stepDscNoParams {
-            param($MyParam)
+            param($MyParam, $Tokens)
 
             Node $AllNodes.NodeName {
                 File test1 {

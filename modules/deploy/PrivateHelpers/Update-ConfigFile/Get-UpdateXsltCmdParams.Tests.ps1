@@ -27,7 +27,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 Describe -Tag "PSCI.unit" "Get-UpdateXsltCmdParams" {
     InModuleScope PSCI.deploy {
 
-        $testFileName = 'Get-UpdateXsltCmdParams.test'
+        $testFileName = "$PSScriptRoot\Get-UpdateXsltCmdParams.test"
 
         function New-TestFile {
             Set-Content -Path $testFileName -Value @'
@@ -82,7 +82,7 @@ Describe -Tag "PSCI.unit" "Get-UpdateXsltCmdParams" {
 
             It "should properly update the file basing on xslt provided in file" {
 
-                $xsltFilename = 'Get-UpdateXsltCmdParams.xslt'
+                $xsltFilename = "$PSScriptRoot\Get-UpdateXsltCmdParams.xslt"
                 try { 
                     New-TestFile
                     New-Item -Path $xsltFilename -Force -ItemType File -Value $xslt

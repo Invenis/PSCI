@@ -27,7 +27,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 Describe -Tag "PSCI.unit" "Get-UpdateXmlAppKeyCmdParams" {
     InModuleScope PSCI.deploy {
 
-        $testFileName = 'Get-UpdateXmlAppKeyCmdParams.test'
+        $testFileName = "$PSScriptRoot\Get-UpdateXmlAppKeyCmdParams.test"
 
         function New-TestFileAppSettings {
             Set-Content -Path $testFileName -Value @'
