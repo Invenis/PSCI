@@ -23,9 +23,9 @@ else {
 }
 
 "Installing build dependencies"
-#Invoke-PSDepend -Path "$PSScriptRoot\build.depend.psd1" -Force -Verbose
+Invoke-PSDepend -Path "$PSScriptRoot\build.depend.psd1" -Force -Verbose
 "Installing project dependencies"
-#Invoke-PSDepend -Path "$PSScriptRoot\psci.depend.psd1" -Target "$PSScriptRoot\..\baseModules" -Force -Verbose
+Invoke-PSDepend -Path "$PSScriptRoot\psci.depend.psd1" -Target "$PSScriptRoot\..\baseModules" -Force -Verbose
 
 ### Run psake
 "Setting build environment"
