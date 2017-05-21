@@ -25,7 +25,9 @@ else {
 "Installing build dependencies"
 Invoke-PSDepend -Path "$PSScriptRoot\build.depend.psd1" -Force -Verbose
 "Installing project dependencies"
-Remove-Item -Path "$PSScriptRoot\..\baseModules" -Recurse -Force -ErrorAction SilentlyContinue
+if (Test-Path -Path "$PSScriptRoot\..\baseModules") { 
+    Remove-Item -Path "$PSScriptRoot\..\baseModules" -Recurse -Force
+}
 Invoke-PSDepend -Path "$PSScriptRoot\psci.depend.psd1" -Target "$PSScriptRoot\..\baseModules" -Force -Verbose
 
 ### Run psake

@@ -13,3 +13,4 @@ StyleCop.cache
 *.nupkg
 .vs/
 /PSCI.pssproj.user
+modules/deploy/dsc/ext/PSGallery/
