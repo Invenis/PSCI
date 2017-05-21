@@ -24,7 +24,7 @@ Task Init {
     "`n"
 }
 
-Task Test -Depends Init  {
+Task Test {
     $lines
        
     $paths = @(
@@ -41,13 +41,18 @@ Task Test -Depends Init  {
     "`n"
 }
 
-Task Build -Depends StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc, Test {
+Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc {
     $lines
     
     # Import-Module to check everything's ok
     $buildDetails = Get-BuildVariables
     $projectName = Join-Path ($BuildDetails.ProjectPath) (Get-ProjectName)
     Import-Module -Name $projectName -Force
+
+    if ($ENV:BHBuildSystem -eq 'Teamcity') {
+      "Updating module psd1 - FunctionsToExport"
+      Set-ModuleFunctions
+    }
 }
 
 Task StaticCodeAnalysis {
