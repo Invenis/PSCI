@@ -26,7 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "New-AzureSASKey" {
 
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
         
         Context "When function called many times" {
             $firstSAS = New-AzureSASKey 

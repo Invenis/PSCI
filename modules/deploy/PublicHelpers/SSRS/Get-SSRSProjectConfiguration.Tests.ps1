@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Get-SSRSProjectConfiguration" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Context "when used with invalid project file" { 
             $Path = "Test.Reports.xxx"

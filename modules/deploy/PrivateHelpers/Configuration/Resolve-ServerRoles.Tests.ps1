@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "ServerRole" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Mock Write-Log { 
             Write-Host $Message

@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "New-DeploymentPlan" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         function config1 {}
         function config2 {}

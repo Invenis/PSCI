@@ -26,7 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Resolve-ScriptedToken" {
 
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Context "When output is set" {
             

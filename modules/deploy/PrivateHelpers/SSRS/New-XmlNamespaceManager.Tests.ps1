@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "New-XmlNamespaceManager" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
         Context "when used with existing namespaces" { 
             It "should define default namespace" {
                 $doc = [xml] @"

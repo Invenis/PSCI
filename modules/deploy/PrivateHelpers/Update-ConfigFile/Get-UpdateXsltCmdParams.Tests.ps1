@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Get-UpdateXsltCmdParams" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         $testFileName = "$PSScriptRoot\Get-UpdateXsltCmdParams.test"
 

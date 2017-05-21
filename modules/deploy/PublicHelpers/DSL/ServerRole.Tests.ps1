@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "ServerRole" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
         Context "when used with single role and environment" {
             $Global:Environments = @{}
 

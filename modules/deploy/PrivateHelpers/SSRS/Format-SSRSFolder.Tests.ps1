@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Format-SSRSFolder" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Context "when used with Folder without '/' prefix" {
         $folder = "JiraReporting"

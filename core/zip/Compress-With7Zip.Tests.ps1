@@ -26,7 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Compress-With7Zip" {
 
-    InModuleScope PSCI.core {
+    InModuleScope PSCI {
         
         function New-TestDirStructure {
             Remove-Item -LiteralPath 'testDir' -Force -Recurse -ErrorAction SilentlyContinue

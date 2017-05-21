@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Protect-WebConfig" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
                 
         Mock Test-Path {}
         Mock Start-ExternalProcess {}    

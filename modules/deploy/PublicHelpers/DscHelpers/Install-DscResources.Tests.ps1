@@ -26,7 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Install-DscResources" {
 
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         $Global:loggedMessage = ''
         $moduleNames = @('cIIS', 'StackExchangeResources', 'xWebAdministration')
@@ -41,7 +41,7 @@ Describe -Tag "PSCI.unit" "Install-DscResources" {
 
         Mock Write-Log $Global:writeLogMock
 
-        InModuleScope PSCI.core {
+        InModuleScope PSCI {
            Mock Write-Log $Global:writeLogMock
         }
 

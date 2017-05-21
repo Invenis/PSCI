@@ -44,7 +44,6 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
     throw "PSCI requires Powershell 3 or 4 (4 is required for DSC). Please install 'Windows Management Framework 4.0' from http://www.microsoft.com/en-us/download/details.aspx?id=40855."
     exit 1
 }
-Set-StrictMode -Version Latest
 
 $importedPsciModules = Get-Module | Where-Object { $_.Name.StartsWith('PSCI') }
 if ($importedPsciModules) { 
@@ -62,22 +61,35 @@ if ($LogConfiguration) {
 }
 . "$curDir\PSCI.globalObjects.ps1"
 
-# 3>$null suppresses warning messages (appearing due to usage of unapproved verbs)
-Import-Module -Name "$curDir\core\PSCI.core.psd1" -Force -Global 3>$null
+$publicFunctions = @()
+Get-ChildItem -Recurse "$curDir\core" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' } | Foreach-Object {
+    . $_.FullName
+    if ($_.FullName -match '(utils|importLibs|zip|sql|csv|config)\\') {
+        $publicFunctions += ($_.Name -replace '.ps1', '')
+    }   
+}
 
-if (Test-Path -LiteralPath "$curDir\modules") {
-    $modulesToImport = Get-ChildItem -Path "$curDir\modules\*\*.psd1" | Where-Object { !$PSBoundParameters.ContainsKey('Submodules') -or $Submodules -icontains $_.BaseName }
-    
-    if ($modulesToImport) {
-        foreach ($modulePath in $modulesToImport.FullName) {
-            Import-Module -Name $modulePath -Force -Global 3>$null
-        }
-        $moduleNames = ($modulesToImport.Name -replace 'PSCI.(.*).psd1', '$1' -join ', ') 
-        Write-Log -Info ("PSCI started with modules: {0}. Path: '{1}'." -f $moduleNames, $PSScriptRoot)
-    } else {
-        Write-Log -Info ("PSCI started with no modules. Path: '{0}'." -f $PSScriptRoot)
+$publicFunctions += @(
+    'Build-DeploymentScriptsPackage'
+)
+
+Get-ChildItem -Recurse "$curDir\modules\build" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' } | Foreach-Object {
+    . $_.FullName 
+    if ($_.FullName -match 'PublicHelpers|BuildPackage|TestsRunners') {
+        $publicFunctions += ($_.Name -replace '.ps1', '')
     }
 }
 
-Export-ModuleMember -Variable `
-    PSCIGlobalConfiguration
+Get-ChildItem -Recurse "$curDir\modules\deploy" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' -and $_ -notmatch '\\BuiltinSteps\\PSCI.*' -and $_ -notmatch '\\deploy\\dsc\\'} | Foreach-Object {
+    . $_.FullName
+    if ($_.FullName -match 'PublicHelpers|DeployPackage') {
+        $publicFunctions += ($_.Name -replace '.ps1', '')
+    }
+}
+Set-Alias Update-SqlLogin New-SqlLogin
+Set-Alias Update-SqlUser New-SqlUser
+
+Write-Log -Info ("PSCI started at '{0}'." -f $PSScriptRoot)
+
+Export-ModuleMember -Function $publicFunctions
+Export-ModuleMember -Variable PSCIGlobalConfiguration

@@ -22,13 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 #>
 
-# note: this is test for a function that resides in Core, but it needs access to dsc modules - so it needs to be run with 'PSCI.deploy' module.
-
 Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Get-DscResourcesPaths" {
 
-    InModuleScope PSCI.core {
+    InModuleScope PSCI {
 
         Context "when supplied empty ModuleNames" {
 

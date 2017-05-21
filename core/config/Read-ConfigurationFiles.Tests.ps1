@@ -26,14 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Read-ConfigurationFiles" {
 
-    InModuleScope PSCI.core {
-
-        Mock Write-Log { 
-            Write-Host "$Message"
-            if ($Critical) {
-                throw ("Exception: " + $Message)
-            }
-        }
+    InModuleScope PSCI {
 
         Mock Get-PSCIModulePath {
             return '.'

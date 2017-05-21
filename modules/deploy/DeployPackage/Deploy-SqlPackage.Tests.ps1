@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Deploy-SqlPackage" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Mock Get-ConfigurationPaths { return @{ PackagesPath = '.' }}
 

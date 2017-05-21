@@ -26,7 +26,7 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Resolve-Tokens" {
 
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Mock Write-Log { 
             Write-Host $Message

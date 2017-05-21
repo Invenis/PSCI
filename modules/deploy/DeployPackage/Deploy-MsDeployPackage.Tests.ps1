@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Deploy-MsDeployPackage" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Mock Remove-Item {}
         Mock Start-MsDeploy {}

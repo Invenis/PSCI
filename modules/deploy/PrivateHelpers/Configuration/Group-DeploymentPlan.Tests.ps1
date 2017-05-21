@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Group-DeploymentPlan" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         $testEntryRemoteCredSSP1 = [PSCustomObject]@{ 
             EntryNo = 1

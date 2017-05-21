@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Resolve-DeploymentPlanSteps" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         function stepWithNoMyParamNoTokens { 'stepWithNoMyParamNoTokens output' }
         function stepWithNoMyParamTokens { param($Tokens) "stepWithNoMyParamTokens output: $($Tokens.TokensCat.token1)" }

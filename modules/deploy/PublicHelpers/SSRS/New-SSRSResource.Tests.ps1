@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.SSRS" "New-SSRSResource" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
 
         Context "when used with image file" { 
             Mock Get-AllBytes { return [Byte[]] (,0xFF * 100) }

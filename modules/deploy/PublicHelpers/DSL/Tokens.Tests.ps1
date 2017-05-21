@@ -25,7 +25,7 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Tokens" {
-    InModuleScope PSCI.deploy {
+    InModuleScope PSCI {
         Context "when used with single group and environment" {
            It "should properly initialize internal structures" {
                 $Global:Environments = @{}

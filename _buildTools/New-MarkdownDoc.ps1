@@ -37,7 +37,7 @@ function New-MarkdownDocModule {
     Base Git url to generate links to source files.
 
     .EXAMPLE
-    New-MarkdownDocModule -ModuleName 'PSCI.build' -OutputPath '..\PSCI.wiki'
+    New-MarkdownDocModule -ModuleName 'PSCI' -OutputPath '..\PSCI.wiki'
     #>
 
     [CmdletBinding()]
