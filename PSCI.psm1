@@ -52,12 +52,16 @@ if ($importedPsciModules) {
 }
 $curDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-$baseModules = Get-ChildItem -Path "$curDir\baseModules\*\*\*.psd1"
-foreach ($baseModule in $baseModules) {
-    Import-Module -Name $baseModule.FullName
-}
+$baseModuleDir = "$curDir\baseModules"
 
-$Script:LogConfiguration.LogLevel = 'Debug'
+Write-Host "Importing PPoshTools"
+Import-Module -Name (Get-ChildItem -Path "$baseModuleDir\PPoShTools\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
+Write-Host "Importing PPoshSqlTools"
+Import-Module -Name (Get-ChildItem -Path "$baseModuleDir\PPoShSqlTools\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
+
+if ($LogConfiguration) { 
+    $LogConfiguration.LogLevel = 'Debug'
+}
 . "$curDir\PSCI.globalObjects.ps1"
 
 # 3>$null suppresses warning messages (appearing due to usage of unapproved verbs)

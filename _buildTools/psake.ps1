@@ -27,9 +27,6 @@ Task Init {
 Task Test -Depends Init  {
     $lines
        
-    $PSVersion = $PSVersionTable.PSVersion.Major
-    "Running Pester tests with PowerShell $PSVersion"
-
     $paths = @(
         "$ProjectRoot\core",
         "$ProjectRoot\modules\deploy\PublicHelpers",
@@ -53,7 +50,7 @@ Task Test -Depends Init  {
     "`n"
 }
 
-Task Build -Depends StaticCodeAnalysis, LicenseChecks, Test {
+Task Build -Depends StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc, Test {
     $lines
     
     # Import-Module to check everything's ok
@@ -63,14 +60,19 @@ Task Build -Depends StaticCodeAnalysis, LicenseChecks, Test {
 }
 
 Task StaticCodeAnalysis {
-    "Running PSScriptAnalyzer"
    <# $Results = Invoke-ScriptAnalyzer -Path $ProjectRoot -Recurse -Settings "$PSScriptRoot\PPoShScriptingStyle.psd1"
     if ($Results) {
         $ResultString = $Results | Out-String
         Write-Warning $ResultString         
         throw "Build failed"
     }#> 
+}
 
+Task RestoreNuGetDsc {
+    & "$ProjectRoot\externalLibs\nuget\nuget.exe" restore `
+        "$ProjectRoot\modules\deploy\dsc\ext\PsGallery\packages.config" `
+        -ConfigFile "$ProjectRoot\modules\deploy\dsc\ext\PsGallery\nuget.config" `
+        -OutputDirectory "$ProjectRoot\modules\deploy\dsc\ext\PsGallery"
 }
 
 Task LicenseChecks {
