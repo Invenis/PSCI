@@ -25,10 +25,7 @@ SOFTWARE.
 function Get-PSCIModulePath {
     <#
     .SYNOPSIS
-    Gets root path of PSCI library or one of its modules.
-
-    .PARAMETER ModuleName
-    Module name. If not specified, 'PSCI'
+    Gets root path of PSCI module.
 
     .EXAMPLE
     Get-PSCIModulePath
@@ -37,16 +34,7 @@ function Get-PSCIModulePath {
     [CmdletBinding()]
     [OutputType([string])]
     param(
-        [Parameter(Mandatory=$false)]
-        [string] 
-        $ModuleName = 'PSCI'
     )
 
-    switch ($ModuleName) {
-        'PSCI' { return Join-Path -Path $PSScriptRoot -ChildPath "../.." }
-        'PSCI.core' { return Join-Path -Path $PSScriptRoot -ChildPath ".." }
-        'PSCI.build' { return Join-Path -Path $PSScriptRoot -ChildPath "../../modules/build" }
-        'PSCI.deploy' { return Join-Path -Path $PSScriptRoot -ChildPath "../../modules/deploy" }
-        default { throw "Unknown module name '$ModuleName'." }
-    }
+    return (Resolve-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "../.."))
 }

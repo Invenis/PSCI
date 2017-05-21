@@ -33,14 +33,7 @@ Task Test -Depends Init  {
     ) | Where-Object { Test-Path $_ }
 
     $TestResults = Invoke-Pester -Path $paths -PassThru -OutputFormat NUnitXml `
-        -OutputFile "$ProjectRoot\Test.xml" -Strict -Tag $TestTags
-    if ($ENV:BHBuildSystem -eq 'AppVeyor') {
-        (New-Object 'System.Net.WebClient').UploadFile(
-            "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)",
-            "$ProjectRoot\$TestFile" )
-    }
-
-    Remove-Item "$ProjectRoot\$TestFile" -Force -ErrorAction SilentlyContinue
+        -OutputFile "$PSScriptRoot\Test.xml" -Strict -Tag $TestTags
 
     if ($TestResults.FailedCount -gt 0) {
         Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"

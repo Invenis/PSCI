@@ -87,8 +87,8 @@ function Copy-PSCI {
         }
         
         # copy required DSC modules
-        $srcPath = Join-Path -Path $psciRootPath -ChildPath 'Public\deploy\dsc'
-        $dstPath = Join-Path -Path $OutputPathPsci -ChildPath (Resolve-Path -LiteralPath $dscSrc -Relative)
+        $srcPath = Join-Path -Path $psciRootPath -ChildPath 'dsc'
+        $dstPath = Join-Path -Path $OutputPathPsci -ChildPath (Resolve-Path -LiteralPath $srcPath -Relative)
 
         foreach ($dscModuleInfo in $dscModulesToInclude) {
             $dest = Join-Path -Path $dstPath -ChildPath ($dscModuleInfo.SrcPath.Substring($srcPath.Length))
