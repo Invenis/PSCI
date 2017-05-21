@@ -36,5 +36,5 @@ function Get-PSCIModulePath {
     param(
     )
 
-    return (Resolve-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "../.."))
+    return (Resolve-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "../..")).ProviderPath
 }
