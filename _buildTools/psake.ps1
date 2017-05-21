@@ -28,10 +28,8 @@ Task Test -Depends Init  {
     $lines
        
     $paths = @(
-        "$ProjectRoot\core",
-        "$ProjectRoot\modules\deploy\PublicHelpers",
-        "$ProjectRoot\modules\deploy\PrivateHelpers",
-        "$ProjectRoot\modules\deploy\DeployPackage"
+        "$ProjectRoot\Private",
+        "$ProjectRoot\Public"
     ) | Where-Object { Test-Path $_ }
 
     $TestResults = Invoke-Pester -Path $paths -PassThru -OutputFormat NUnitXml `
@@ -70,9 +68,9 @@ Task StaticCodeAnalysis {
 
 Task RestoreNuGetDsc {
     & "$ProjectRoot\externalLibs\nuget\nuget.exe" restore `
-        "$ProjectRoot\modules\deploy\dsc\ext\PsGallery\packages.config" `
-        -ConfigFile "$ProjectRoot\modules\deploy\dsc\ext\PsGallery\nuget.config" `
-        -OutputDirectory "$ProjectRoot\modules\deploy\dsc\ext\PsGallery"
+        "$ProjectRoot\dsc\ext\PsGallery\packages.config" `
+        -ConfigFile "$ProjectRoot\dsc\ext\PsGallery\nuget.config" `
+        -OutputDirectory "$ProjectRoot\dsc\ext\PsGallery"
 }
 
 Task LicenseChecks {

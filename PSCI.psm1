@@ -27,7 +27,7 @@ SOFTWARE.
 Main PSCI module.
 
 .PARAMETER Submodules
-List of submodules to import. If not specified, all modules will be imported.
+Deprecated - List of submodules to import. If not specified, all modules will be imported.
 
 .DESCRIPTION
 It initializes some global variables and iterates current directory to include child modules.
@@ -62,30 +62,14 @@ if ($LogConfiguration) {
 . "$curDir\PSCI.globalObjects.ps1"
 
 $publicFunctions = @()
-Get-ChildItem -Recurse "$curDir\core" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' } | Foreach-Object {
+Get-ChildItem -Recurse "$curDir\Private" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' } | Foreach-Object {
     . $_.FullName
-    if ($_.FullName -match '(utils|importLibs|zip|sql|csv|config)\\') {
-        $publicFunctions += ($_.Name -replace '.ps1', '')
-    }   
 }
-
-$publicFunctions += @(
-    'Build-DeploymentScriptsPackage'
-)
-
-Get-ChildItem -Recurse "$curDir\modules\build" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' } | Foreach-Object {
-    . $_.FullName 
-    if ($_.FullName -match 'PublicHelpers|BuildPackage|TestsRunners') {
-        $publicFunctions += ($_.Name -replace '.ps1', '')
-    }
-}
-
-Get-ChildItem -Recurse "$curDir\modules\deploy" -Include *.ps1 | Where-Object { $_ -notmatch '\.Tests.ps1' -and $_ -notmatch '\\BuiltinSteps\\PSCI.*' -and $_ -notmatch '\\deploy\\dsc\\'} | Foreach-Object {
+Get-ChildItem -Recurse "$curDir\Public" -Include *.ps1 |  Where-Object { $_ -notmatch '\.Tests.ps1' -and $_ -notmatch '\\BuiltinSteps\\PSCI.*' -and $_ -notmatch '\\deploy\\dsc\\'} | Foreach-Object {
     . $_.FullName
-    if ($_.FullName -match 'PublicHelpers|DeployPackage') {
-        $publicFunctions += ($_.Name -replace '.ps1', '')
-    }
+    $publicFunctions += $_.Basename
 }
+
 Set-Alias Update-SqlLogin New-SqlLogin
 Set-Alias Update-SqlUser New-SqlUser
 
