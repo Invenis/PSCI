@@ -26,12 +26,6 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Update-TokensInZipFile" {
     InModuleScope PSCI.deploy {
-        Mock Write-Log { 
-            Write-Output $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Mock Test-Path { return $true } -ParameterFilter { $LiteralPath -eq 'test.zip' }
         Mock Copy-Item { }

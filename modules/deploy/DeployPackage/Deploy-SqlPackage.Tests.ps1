@@ -26,15 +26,10 @@ Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Deploy-SqlPackage" {
     InModuleScope PSCI.deploy {
-        Mock Write-Log { 
-            Write-Output $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Mock Get-ConfigurationPaths { return @{ PackagesPath = '.' }}
 
+        #Write-Log -Info "Starting"
         $global:sqlsInvoked = @()
         Mock Invoke-Sql { 
             $global:sqlsInvoked += $InputFile 
@@ -56,6 +51,7 @@ Describe -Tag "PSCI.unit" "Deploy-SqlPackage" {
         }
 
         Context "when invoked with default parameters" {
+         
             try { 
                 New-SqlTestPackage
                 $global:sqlsInvoked = @()

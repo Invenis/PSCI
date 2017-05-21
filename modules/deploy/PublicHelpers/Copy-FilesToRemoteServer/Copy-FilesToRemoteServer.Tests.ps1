@@ -25,12 +25,8 @@ SOFTWARE.
 Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Copy-FilesToRemoteServer" {
-    Mock Write-Log { 
-                $Global:loggedMessage += $Message
-                Write-Host $Message
-            }
 
-    InModuleScope PSCI.core {
+    InModuleScope PSCI.deploy {
 
         $Global:loggedMessage = @('')
 

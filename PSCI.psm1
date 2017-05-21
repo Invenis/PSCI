@@ -57,7 +57,7 @@ foreach ($baseModule in $baseModules) {
     Import-Module -Name $baseModule.FullName
 }
 
-$Script:LogConfiguration.LogLevel = [LogLevel]::Debug
+$Script:LogConfiguration.LogLevel = 'Debug'
 . "$curDir\PSCI.globalObjects.ps1"
 
 # 3>$null suppresses warning messages (appearing due to usage of unapproved verbs)

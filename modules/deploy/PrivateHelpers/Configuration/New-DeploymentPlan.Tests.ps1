@@ -33,12 +33,6 @@ Describe -Tag "PSCI.unit" "New-DeploymentPlan" {
         function config4 {}
 
         Mock Get-ConfigurationPaths { return @{ PackagesPath = '.' } }
-        Mock Write-Log { 
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Configuration dsc1 {
             param ($NodeName, $Environment, $Tokens)

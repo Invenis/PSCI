@@ -26,12 +26,6 @@ Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.SSRS" "Deploy-SSRSReportsByWebService" {
     InModuleScope PSCI.deploy {
-        Mock Write-Log { 
-            Write-Output $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Mock Test-Path { return $true }
         Mock Get-ConfigurationPaths { return @{ PackagesPath = '.' }}

@@ -44,6 +44,9 @@ function Get-PSCIModulePath {
 
     $module = Get-Module -Name $ModuleName
     if (!$module) {
+        if ($ModuleName -eq 'PSCI') {
+            return Join-Path -Path $PSScriptRoot -ChildPath "../.."
+        }
         throw "Cannot find Powershell module named '$ModuleName'."
     }
     return (Split-Path -Path $module.Path -Parent)

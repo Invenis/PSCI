@@ -26,12 +26,6 @@ Import-Module -Name "$PSScriptRoot\..\..\..\PSCI.psd1"
 
 Describe -Tag "PSCI.unit" "Deploy-MsDeployPackage" {
     InModuleScope PSCI.deploy {
-        Mock Write-Log { 
-            Write-Output $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Mock Remove-Item {}
         Mock Start-MsDeploy {}

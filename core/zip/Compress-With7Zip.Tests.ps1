@@ -48,13 +48,6 @@ Describe -Tag "PSCI.unit" "Compress-With7Zip" {
             Remove-Item -LiteralPath 'testDirOut' -Force -Recurse -ErrorAction SilentlyContinue
         }
 
-        Mock Write-Log { 
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
-
         Mock Start-ExternalProcess {
             Write-Host "Arguments passed to 7z: $ArgumentList"
         }

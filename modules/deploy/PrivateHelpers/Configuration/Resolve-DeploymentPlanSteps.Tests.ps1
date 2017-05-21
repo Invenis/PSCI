@@ -34,12 +34,6 @@ Describe -Tag "PSCI.unit" "Resolve-DeploymentPlanSteps" {
 
         $packagePath = 'c:\PSCITest'
         Mock Get-ConfigurationPaths { return @{ PackagesPath = $packagePath } }
-        Mock Write-Log { 
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
 
         Configuration stepDsc {
             param ($NodeName, $Environment, $Tokens, $MyParam)

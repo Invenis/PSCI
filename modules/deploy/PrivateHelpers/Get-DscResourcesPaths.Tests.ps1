@@ -30,13 +30,6 @@ Describe -Tag "PSCI.unit" "Get-DscResourcesPaths" {
 
     InModuleScope PSCI.core {
 
-        Mock Write-Log { 
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
-
         Context "when supplied empty ModuleNames" {
 
             $result = Get-DscResourcesPaths

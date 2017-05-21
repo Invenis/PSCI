@@ -28,13 +28,6 @@ Describe -Tag "PSCI.unit" "Copy-Directory" {
 
     InModuleScope PSCI.core {
 
-        Mock Write-Log { 
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
-
         function New-TestDirStructure {
             Remove-Item -LiteralPath 'testDir' -Force -Recurse -ErrorAction SilentlyContinue
             Remove-Item -LiteralPath 'testDirOut' -Force -Recurse -ErrorAction SilentlyContinue

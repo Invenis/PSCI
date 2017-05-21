@@ -26,17 +26,11 @@ Import-Module -Name "$PSScriptRoot\..\..\..\..\PSCI.psd1" -Force
 
 Describe -Tag "PSCI.unit" "Copy-FilesFromRemoteServer" {
 
-    InModuleScope PSCI.core {
+    InModuleScope PSCI.deploy {
 
         $Global:loggedMessage = ''
 
-        Mock Write-Log { 
-            $Global:loggedMessage += $Message
-            Write-Host $Message
-            if ($Critical) {
-                throw $Message
-            }
-        }
+        
 
         $connectionParams = New-ConnectionParameters -Nodes 'localhost'
 
