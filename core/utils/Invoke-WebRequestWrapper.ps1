@@ -142,10 +142,12 @@ function Invoke-WebRequestWrapper {
     } catch {
         $response = $_.Exception.Response
         if (!$response) {
-            Write-ErrorRecord -StopExecution -Message ("HTTP request failed with no response data.")
+            Write-Log -Error "HTTP request failed with no response data."
+            throw
         } else {
             if ($FailOnErrorResponse) {
-                Write-ErrorRecord -StopExecution -Message ("HTTP request failed with code {0} ({1}).`n RawContent: {2}" -f [int]$response.StatusCode, $response.StatusDescription, $response.RawContent)
+                Write-Log -Error ("HTTP request failed with code {0} ({1}).`n RawContent: {2}" -f [int]$response.StatusCode, $response.StatusDescription, $response.RawContent)
+                throw
             } else {
                 $response
             }

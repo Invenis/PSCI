@@ -256,7 +256,8 @@ function Invoke-ExternalCommand {
             }
         }    
     } catch {
-        Write-ErrorRecord -StopExecution
+        Write-ErrorRecord
+        throw
     } finally {
         $ErrorActionPreference = $oldErrorActionPreference
         if ($WorkingDirectory) {

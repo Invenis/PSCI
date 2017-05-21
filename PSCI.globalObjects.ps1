@@ -23,6 +23,10 @@ SOFTWARE.
 #>
 
 $Global:PSCIGlobalConfiguration = [PSCustomObject]@{
+
+    # Deprecated - use $LogConfiguration.LogFile
+    LogFile = $null;
+
     # If $null then it means that script is executed on the current machine (without remoting)
     # PSRemoting - means script is executed remotely using psremoting mechanism
     # WebDeployHandler - means script is executed remotely using web deployment hanlder (IIS handler)

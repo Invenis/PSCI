@@ -1,4 +1,4 @@
 @{
-  PPoShTools = '0.1.10'
-  PPoShSqlTools = '0.1.3'
+  PPoShTools = '0.1.12'
+  PPoShSqlTools = '0.1.4'
 }
