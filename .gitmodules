@@ -1,6 +1,0 @@
-[submodule "modules/teamcityExtensions"]
-	path = modules/teamcityExtensions
-	url = https://github.com/ObjectivityBSS/PSCI.teamcityExtensions
-[submodule "modules/teamcityMaintenance"]
-	path = modules/teamcityMaintenance
-	url = https://github.com/ObjectivityBSS/PSCI.teamcityMaintenance
