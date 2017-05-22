@@ -78,7 +78,7 @@ function Update-SqlLogin {
         $cred = (New-Object System.Management.Automation.PsCredential $Username, $pass)
     }
     else { 
-        $cred = (New-Object System.Management.Automation.PsCredential $Username)
+        $cred = (New-Object System.Management.Automation.PsCredential $Username, (New-Object System.Security.SecureString))
     }
 
     New-SqlLogin -ConnectionString $ConnectionString -Credentials $cred -WindowsAuthentication:$WindowsAuthentication -ServerRoles $ServerRoles
