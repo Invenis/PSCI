@@ -78,7 +78,11 @@ Get-ChildItem -Recurse "$curDir\Public" -Include *.ps1 |  Where-Object { $_ -not
 Set-Alias Update-SqlLogin New-SqlLogin
 Set-Alias Update-SqlUser New-SqlUser
 
-Write-Log -Info ("PSCI started at '{0}'." -f $PSScriptRoot)
-
 Export-ModuleMember -Function $publicFunctions
 Export-ModuleMember -Variable PSCIGlobalConfiguration
+
+$psVersion = "$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
+$pposhToolsVersion = (Get-Module -Name PPoshTools) | Select-Object -ExpandProperty Version
+$bit = if ([Environment]::Is64BitProcess) { 'x64' } else { 'x86' }
+Write-Log -Info ("PSCI started at '{0}', Powershell {1} {2}, PPoShTools ver {3}." -f $PSScriptRoot, $psVersion, $bit, $pposhToolsVersion)
+
