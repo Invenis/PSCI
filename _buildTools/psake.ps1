@@ -41,7 +41,7 @@ Task Test {
     "`n"
 }
 
-Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc {
+Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc, Test {
     $lines
     
     # Import-Module to check everything's ok
