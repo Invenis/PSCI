@@ -68,7 +68,7 @@ Configuration ConfigureMyWebApplicationIIS {
                 DisplayName = 'MyWebsite' 
                 Ensure = 'Present' 
                 Action = 'Allow' 
-                State = 'Enabled'
+                Enabled = 'True'
                 LocalPort = "$($Tokens.WebConfig.WebsitePort)"
                 RemotePort = 'Any'
                 Profile = 'Any'
