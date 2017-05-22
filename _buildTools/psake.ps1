@@ -9,8 +9,9 @@ if (-not $ProjectRoot) {
     $ProjectRoot = Split-Path -Parent $PSScriptRoot
 }
 
-$Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
+$Timestamp = Get-Date -uformat "%Y%m%d-%H%M%S"
 $lines = '----------------------------------------------------------------------'
+$buildToolsPath = "$ProjectRoot\_buildTools"
 
 # Tasks
 
@@ -41,7 +42,7 @@ Task Test {
     "`n"
 }
 
-Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestoreNuGetDsc, Test {
+Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestorePowershellGallery, RestoreNuGetDsc, Test {
     $lines
     
     # Import-Module to check everything's ok
@@ -65,10 +66,29 @@ Task StaticCodeAnalysis {
 }
 
 Task RestoreNuGetDsc {
-    & "$ProjectRoot\externalLibs\nuget\nuget.exe" restore `
-        "$ProjectRoot\dsc\ext\PsGallery\packages.config" `
-        -ConfigFile "$ProjectRoot\dsc\ext\PsGallery\nuget.config" `
-        -OutputDirectory "$ProjectRoot\dsc\ext\PsGallery"
+    $nugetPath = "$ProjectRoot\externalLibs\nuget\nuget.exe"
+    $dscPath = "$ProjectRoot\dsc\ext\PsGallery"
+
+    & $nugetPath restore `
+        "$dscPath\packages.config" `
+        -ConfigFile "$dscPath\nuget.config" `
+        -OutputDirectory "$dscPath"
+        
+    $dscPath = "$ProjectRoot\dsc\ext\Grani"
+    & $nugetPath restore `
+        "$dscPath\packages.config" `
+        -ConfigFile "$dscPath\nuget.config" `
+        -OutputDirectory "$dscPath"
+}
+
+Task RestorePowershellGallery {
+  "Installing project dependencies"
+  $dependencyPath = "$buildToolsPath\psci.depend.psd1"
+  $dstPath = "$ProjectRoot\baseModules"
+  if (Test-Path -Path $dstPath) { 
+      Remove-Item -Path "$dstPath" -Recurse -Force
+  }
+  Invoke-PSDepend -Path $dependencyPath -Target $dstPath -Force -Verbose
 }
 
 Task LicenseChecks {
