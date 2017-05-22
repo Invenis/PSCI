@@ -53,6 +53,7 @@ Configuration ConfigureMyWebApplicationIIS {
             Name   = $Tokens.WebConfig.WebsiteName
             ApplicationPool = $Tokens.WebConfig.AppPoolName 
             BindingInfo = MSFT_xWebBindingInformation { 
+                Protocol = 'http'
                 Port = $Tokens.WebConfig.WebsitePort
             } 
             PhysicalPath = $Tokens.WebConfig.WebsitePhysicalPath
