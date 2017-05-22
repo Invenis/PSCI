@@ -25,14 +25,14 @@ SOFTWARE.
 Configuration ConfigureMyWebApplicationIIS {
     param ($NodeName, $Environment, $Tokens)
 
-    Import-DSCResource -Module cIIS
     # DSC PSGallery resources are included in PSCI
+    Import-DSCResource -Module xWebAdministration
     Import-DSCResource -Module xNetworking
 
     Node $NodeName {
 
         # configure application pool
-        cAppPool $Tokens.WebConfig.AppPoolName { 
+        xWebAppPool $Tokens.WebConfig.AppPoolName { 
             Name   = $Tokens.WebConfig.AppPoolName
             Ensure = 'Present'
             AutoStart = $true
@@ -49,10 +49,10 @@ Configuration ConfigureMyWebApplicationIIS {
         }
 
         # create site on IIS
-        cWebsite MyWebsite { 
+        xWebsite MyWebsite { 
             Name   = $Tokens.WebConfig.WebsiteName
             ApplicationPool = $Tokens.WebConfig.AppPoolName 
-            BindingInfo = OBJ_cWebBindingInformation { 
+            BindingInfo = MSFT_xWebBindingInformation { 
                 Port = $Tokens.WebConfig.WebsitePort
             } 
             PhysicalPath = $Tokens.WebConfig.WebsitePhysicalPath

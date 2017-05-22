@@ -79,9 +79,6 @@ Get-ChildItem -Recurse "$curDir\Public" -Include *.ps1 |  Where-Object { $_ -not
     $publicFunctions += $_.Basename
 }
 
-Set-Alias Update-SqlLogin New-SqlLogin
-Set-Alias Update-SqlUser New-SqlUser
-
 Export-ModuleMember -Function $publicFunctions
 Export-ModuleMember -Variable PSCIGlobalConfiguration
 
