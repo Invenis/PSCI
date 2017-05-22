@@ -53,12 +53,16 @@ $curDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $baseModuleDir = "$curDir\baseModules"
 
-if (!(Get-Module -Name PPoShTools) -and !(Get-Module -Name PPoShTools -ListAvailable)) {
-    Import-Module -Name (Get-ChildItem -Path "$baseModuleDir\PPoShTools\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
-}
-
-if (!(Get-Module -Name PPoShSqlTools) -and !(Get-Module -Name PPoShSqlTools -ListAvailable)) {
-    Import-Module -Name (Get-ChildItem -Path "$baseModuleDir\PPoShSqlTools\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
+$baseModulesToImport = @('PPoShTools', 'PPoShSqlTools')
+foreach ($baseModule in $baseModulesToImport) {
+    if (Get-Module -Name $baseModule) {
+        continue 
+    }
+    if (Get-Module -Name $baseModule -ListAvailable) {
+        Import-Module -Name $baseModule
+        continue
+    }
+    Import-Module -Name (Get-ChildItem -Path "${baseModuleDir}\${baseModule}\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
 }
 
 if ($LogConfiguration) { 
