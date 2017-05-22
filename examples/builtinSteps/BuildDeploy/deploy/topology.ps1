@@ -45,7 +45,7 @@ Environment Default {
 
     ServerRole IISConfigTestRole -Steps 'PSCIIISConfig' -ServerConnections TestNode
 
-    Step Custom-WindowsFeaturesStep -ScriptBlock { PSCIWindowsFeature -Tokens $Tokens.CustomWindowsFeatures }
+    Step Custom-WindowsFeaturesStep -ScriptBlock { PSCIWindowsFeature }
 }
 
 Environment Test {
