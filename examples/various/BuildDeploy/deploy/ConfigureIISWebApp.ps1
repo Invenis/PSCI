@@ -26,10 +26,11 @@ Configuration ConfigureIISWebApp {
     param ($NodeName, $Environment, $Tokens)
     
     Import-DSCResource -Module cIIS
+    Import-DSCResource -Module xWebAdministration
 
     Node $NodeName {
 
-        cAppPool PSCITestAppPool { 
+        xWebAppPool PSCITestAppPool { 
             Name   = $Tokens.WebServerProvision.AppPoolName 
             managedRuntimeVersion = 'v4.0'
             managedPipelineMode = 'Integrated'
@@ -40,16 +41,17 @@ Configuration ConfigureIISWebApp {
             DestinationPath = $Tokens.WebServerProvision.WebsitePhysicalPath
             Ensure = 'Present'
             Type = 'Directory'
-            DependsOn = @('[cAppPool]PSCITestAppPool')
+            DependsOn = @('[xWebAppPool]PSCITestAppPool')
         }
 
-        cWebsite PSCIWebsite { 
+        xWebsite PSCIWebsite { 
             Name   = $Tokens.WebServerProvision.WebsiteName
             ApplicationPool = $Tokens.WebServerProvision.AppPoolName 
             Ensure = 'Present' 
-            BindingInfo = OBJ_cWebBindingInformation { 
-                            Port = $Tokens.WebServerProvision.WebsitePort
-                        } 
+            BindingInfo = MSFT_xWebBindingInformation { 
+                Protocol = 'http'
+                Port = $Tokens.WebServerProvision.WebsitePort
+            } 
             PhysicalPath = $Tokens.WebServerProvision.WebsitePhysicalPath
             State = 'Started' 
             DependsOn = @('[File]PSCITestWebsiteDir')
@@ -60,14 +62,14 @@ Configuration ConfigureIISWebApp {
             WebsiteName =  $Tokens.WebServerProvision.WebsiteName
             Ensure = 'Present'
             AuthenticationMethod = 'Windows'
-            DependsOn = @('[cWebsite]PSCIWebsite')
+            DependsOn = @('[xWebsite]PSCIWebsite')
         }
 
         cIISWebsiteAuthentication PSCIWebsiteAnonymousAuth {
             WebsiteName =  $Tokens.WebServerProvision.WebsiteName
             Ensure = 'Present'
             AuthenticationMethod = 'Anonymous'
-            DependsOn = @('[cWebsite]PSCIWebsite')
+            DependsOn = @('[xWebsite]PSCIWebsite')
         }
 
     }

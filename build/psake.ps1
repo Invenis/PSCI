@@ -47,7 +47,7 @@ Task Test {
     "`n"
 }
 
-Task Build -Depends Init, LicenseChecks, RestorePowershellGallery, RestoreNuGetDsc, Test {
+Task Build -Depends Init, LicenseChecks, RestorePowershellGallery, RestoreNuGetDsc {
     $lines
     
     # Import-Module to check everything's ok
