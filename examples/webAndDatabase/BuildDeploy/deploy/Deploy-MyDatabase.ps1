@@ -30,6 +30,7 @@ function Deploy-MyDatabase {
     if ($Tokens.DatabaseConfig.DropDatabase) { 
         Remove-SqlDatabase -DatabaseName $databaseName -ConnectionString $connectionString
     }
+    New-SqlDatabase -ConnectionString $connectionString -DatabaseName $databaseName
 
     Deploy-EntityFrameworkMigratePackage -PackageName 'MyDatabase' -ConnectionString $connectionString -MigrateAssembly 'DataModel.dll'
 

@@ -91,7 +91,14 @@ Describe -Tag "PSCI.unit" "Install-DscResources" {
             $expectedDst = (Get-DscResourcesPaths $moduleNames).DstPath
             Remove-Item -LiteralPath $expectedDst -Force -Recurse -ErrorAction SilentlyContinue
 
-            Install-DscResources -ModuleNames $moduleNames
+            if ($Env:PSCIWinRmUser) {
+               $cred = ConvertTo-PSCredential -User $Env:PSCIWinRmUser -Password $Env:PSCIWinRmPassword
+               $connectionParams = New-ConnectionParameters -Nodes 'localhost' -Credential $cred
+            }
+            else {
+                $connectionParams = New-ConnectionParameters -Nodes 'localhost'
+            }
+            Install-DscResources -ModuleNames $moduleNames -ConnectionParams $connectionParams
 
             It "should copy modules" {
                 Test-Path -LiteralPath $expectedDst | Should Be @($true, $true, $true)

@@ -30,7 +30,13 @@ Describe -Tag "PSCI.unit" "Copy-FilesFromRemoteServer" {
 
         $Global:loggedMessage = ''
 
-        $connectionParams = New-ConnectionParameters -Nodes 'localhost'
+        if ($Env:PSCIWinRmUser) {
+            $cred = ConvertTo-PSCredential -User $Env:PSCIWinRmUser -Password $Env:PSCIWinRmPassword
+            $connectionParams = New-ConnectionParameters -Nodes 'localhost' -Credential $cred
+        }
+        else {
+            $connectionParams = New-ConnectionParameters -Nodes 'localhost'
+        }
 
         $srcDir = 'c:\PSCITestDirSrc'
         $dstDir = 'c:\PSCITestDirDst'
