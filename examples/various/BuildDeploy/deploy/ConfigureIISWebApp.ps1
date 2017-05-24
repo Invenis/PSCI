@@ -52,6 +52,8 @@ Configuration ConfigureIISWebApp {
             Account = "IIS AppPool\$($Tokens.WebServerProvision.AppPoolName)"
             Ensure  = 'Present'
             Rights  = 'ReadAndExecute'
+            Inherit = $true
+            Recurse = $true
         }
 
         xWebsite PSCIWebsite { 
