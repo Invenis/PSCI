@@ -34,6 +34,14 @@ build_script:
   
 artifacts:
   - path: PSCI
+ 
+# integration tests 
+before_deploy:
+  - ps: . ./examples/various/BuildDeploy/build.ps1
+  - ps: . ./examples/webAndDatabase/BuildDeploy/build.ps1
+  - ps: . ./examples/various/bin/DeployScripts/deploy.ps1 -TokensOverride @{ 'Credentials.UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; 'Topology.Nodes' = 'localhost' }
+  - ps: . ./examples/various/bin/webAndDatabase/deploy.ps1 -TokensOverride @{ 'UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
+  - ps: . ./examples/builtinSteps/BuildDeploy/deploy.ps1 -TokensOverride @{ 'UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
     
 deploy:
   - provider: GitHub
