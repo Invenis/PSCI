@@ -65,9 +65,7 @@ foreach ($baseModule in $baseModulesToImport) {
     Import-Module -Name (Get-ChildItem -Path "${baseModuleDir}\${baseModule}\*\*.psd1" | Select-Object -ExpandProperty FullName) -Force -Global
 }
 
-if ($LogConfiguration) { 
-    $LogConfiguration.LogLevel = 'Debug'
-}
+Set-LogConfiguration -LogLevel Debug
 . "$curDir\PSCI.globalObjects.ps1"
 
 $publicFunctions = @()

@@ -4,6 +4,14 @@ skip_commits:
 
 image: Visual Studio 2017
 
+environment:
+  NugetApiKey:
+    secure: DIE2y66RzXWvp2Q0wIOLlBTjxILBGeHyyg3pjwWjdVrggzuj9BuMWCdfHFmt9nt2
+  PowershellGalleryApiKey:
+    secure: IpwbqCY/2gU1iKYzF6bPJtILUY789f9fpgt+zP0LRrOK5Y3JXajA5yk/XaRkVjuy
+  GithubAuthToken:
+    secure: PkFAZB6f1lwOR9i3Mn9mR+kQBszikFVxmrhtOGK7p/xKlVF8o/htJc9LSQDSi3bN
+    
 init:
   # Set "build version number" to "short-commit-hash" or when tagged to "tag name"
   - ps: >-
@@ -12,14 +20,10 @@ init:
         Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME"
         $env:packageVersion = "$env:APPVEYOR_REPO_TAG_NAME" 
       }
-
-environment:
-  NugetApiKey:
-    secure: DIE2y66RzXWvp2Q0wIOLlBTjxILBGeHyyg3pjwWjdVrggzuj9BuMWCdfHFmt9nt2
-  PowershellGalleryApiKey:
-    secure: IpwbqCY/2gU1iKYzF6bPJtILUY789f9fpgt+zP0LRrOK5Y3JXajA5yk/XaRkVjuy
-  GithubAuthToken:
-    secure: PkFAZB6f1lwOR9i3Mn9mR+kQBszikFVxmrhtOGK7p/xKlVF8o/htJc9LSQDSi3bN
+  - git config --global core.autocrlf true
+  
+install:
+  - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Enable-Remoting
 
 build_script:
   - ps: ./build/build.ps1

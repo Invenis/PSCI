@@ -38,6 +38,8 @@ Describe -Tag "PSCI.unit" "Resolve-DeploymentPlanSteps" {
         Configuration stepDsc {
             param ($NodeName, $Environment, $Tokens, $MyParam)
 
+            Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
+
             Node $NodeName {
                 File test1 {
                     DestinationPath = 'c:\PSCItest\' + $Tokens.TokensCat.token1 + ".$MyParam"
@@ -47,6 +49,8 @@ Describe -Tag "PSCI.unit" "Resolve-DeploymentPlanSteps" {
 
         Configuration stepDscNoParams {
             param($MyParam, $Tokens)
+
+            Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
 
             Node $AllNodes.NodeName {
                 File test1 {

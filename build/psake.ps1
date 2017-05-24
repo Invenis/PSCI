@@ -33,8 +33,13 @@ Task Test {
         "$ProjectRoot\Public"
     ) | Where-Object { Test-Path $_ }
 
-    $TestResults = Invoke-Pester -Path $paths -PassThru -OutputFormat NUnitXml `
-        -OutputFile "$PSScriptRoot\Test.xml" -Strict -Tag $TestTags
+    $TestResults = Invoke-Pester -Path $paths -PassThru -OutputFormat NUnitXml -OutputFile "$PSScriptRoot\Test.xml" -Strict -Tag $TestTags
+        
+    if ($ENV:BHBuildSystem -eq 'AppVeyor') {
+        (New-Object 'System.Net.WebClient').UploadFile(
+            "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)",
+            "$PSScriptRoot\Test.xml" )
+    }        
 
     if ($TestResults.FailedCount -gt 0) {
         Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
@@ -42,7 +47,7 @@ Task Test {
     "`n"
 }
 
-Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestorePowershellGallery, RestoreNuGetDsc, Test {
+Task Build -Depends Init, LicenseChecks, RestorePowershellGallery, RestoreNuGetDsc, Test {
     $lines
     
     # Import-Module to check everything's ok
@@ -66,12 +71,21 @@ Task Build -Depends Init, StaticCodeAnalysis, LicenseChecks, RestorePowershellGa
 }
 
 Task StaticCodeAnalysis {
-   <# $Results = Invoke-ScriptAnalyzer -Path $ProjectRoot -Recurse -Settings "$PSScriptRoot\PSCIScriptingStyle.psd1"
+    $Results = Invoke-ScriptAnalyzer -Path $ProjectRoot -Recurse -Settings "$PSScriptRoot\PSCIScriptingStyle.psd1"
     if ($Results) {
         $ResultString = $Results | Out-String
-        Write-Warning $ResultString         
+        Write-Warning $ResultString  
+        if ($ENV:BHBuildSystem -eq 'AppVeyor') {
+            Add-AppveyorMessage -Message "PSScriptAnalyzer output contained one or more result(s) with 'Error' severity.`
+            Check the 'Tests' tab of this build for more details." -Category Error
+            Update-AppveyorTest -Name "PsScriptAnalyzer" -Outcome Failed -ErrorMessage $ResultString
+        }        
         throw "Build failed"
-    }#> 
+    } else {
+      if ($ENV:BHBuildSystem -eq 'AppVeyor') {
+            Update-AppveyorTest -Name "PsScriptAnalyzer" -Outcome Passed
+      }
+    }
 }
 
 Task RestoreNuGetDsc {
