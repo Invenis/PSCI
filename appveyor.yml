@@ -25,8 +25,8 @@ init:
   - git config --global core.autocrlf true
   
 install:
-  - ps: net user /add $env:PSCIWinRmUser $env:PSCIWinRmPassword
-  - ps: net localgroup administrators $env:PSCIWinRmUser /add
+  - ps: & net user $env:PSCIWinRmUser $env:PSCIWinRmPassword /add /y 
+  - ps: & net localgroup administrators $env:PSCIWinRmUser /add
   - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Set-ExecutionPolicy RemoteSigned -Force; Enable-Remoting
 
 build_script:
