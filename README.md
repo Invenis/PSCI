@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/eweae6q9yd27kcno/branch/master?svg=true)](https://ci.appveyor.com/project/ObjectivityAdminsTeam/psci/branch/master)
+
 ### PSCI - Powershell Continuous Integration / Configuration as Code
 -------------
 PSCI is a build and deployment automation library that provides a simple Powershell DSC-like language allowing to express configuration as code. The general flow is presented on the image below:
