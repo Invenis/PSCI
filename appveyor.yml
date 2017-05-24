@@ -23,7 +23,7 @@ init:
   - git config --global core.autocrlf true
   
 install:
-  - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Enable-Remoting
+  - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Set-ExecutionPolicy RemoteSigned -Force; Enable-Remoting
 
 build_script:
   - ps: ./build/build.ps1
