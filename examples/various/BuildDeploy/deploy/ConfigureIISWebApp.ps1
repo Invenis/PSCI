@@ -26,6 +26,7 @@ Configuration ConfigureIISWebApp {
     param ($NodeName, $Environment, $Tokens)
     
     Import-DSCResource -Module cIIS
+    Import-DSCResource -Module GraniResource
     Import-DSCResource -Module xWebAdministration
 
     Node $NodeName {
@@ -34,6 +35,7 @@ Configuration ConfigureIISWebApp {
             Name   = $Tokens.WebServerProvision.AppPoolName 
             managedRuntimeVersion = 'v4.0'
             managedPipelineMode = 'Integrated'
+            identityType = 'ApplicationPoolIdentity'
             Ensure = 'Present' 
         }
 
@@ -42,6 +44,14 @@ Configuration ConfigureIISWebApp {
             Ensure = 'Present'
             Type = 'Directory'
             DependsOn = @('[xWebAppPool]PSCITestAppPool')
+        }
+
+        cACL PSCITestWebsiteDirAcl
+        {
+            Path = $Tokens.WebServerProvision.WebsitePhysicalPath
+            Account = "IIS AppPool\$($Tokens.WebServerProvision.AppPoolName)"
+            Ensure  = 'Present'
+            Rights  = 'ReadAndExecute'
         }
 
         xWebsite PSCIWebsite { 
@@ -54,7 +64,7 @@ Configuration ConfigureIISWebApp {
             } 
             PhysicalPath = $Tokens.WebServerProvision.WebsitePhysicalPath
             State = 'Started' 
-            DependsOn = @('[File]PSCITestWebsiteDir')
+            DependsOn = @('[cACL]PSCITestWebsiteDirAcl')
         } 
         
 

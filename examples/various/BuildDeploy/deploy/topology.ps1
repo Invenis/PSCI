@@ -39,7 +39,7 @@ Environment Default {
     ServerConnection TestNodePSRemoting -BasedOn TestNodeDefault -RemotingCredential { $Tokens.Credentials.RemotingCredential }
     ServerConnection TestNodeMSDeploy -BasedOn TestNodePSRemoting -RemotingMode WebDeployAgentService
 
-    ServerRole Web -Steps @('ConfigureIISProvision', 'ConfigureIISWebApp') -ServerConnections TestNodePSRemoting
+    ServerRole Web -Steps @('ConfigureIISProvision', 'ConfigureIISWebApp', 'WebDeployProvision') -ServerConnections TestNodePSRemoting
     ServerRole Database -Steps @('Deploy-Database') -ServerConnections TestNodeDefault
 
     ServerRole RemotingTestPSRemoting -Steps @('Prepare-RemotingTest', 'Validate-RemotingTest', 'Validate-Website') -RunRemotely -ServerConnections TestNodePSRemoting
