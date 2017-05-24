@@ -25,7 +25,6 @@ SOFTWARE.
 Configuration ConfigureIISWebApp {
     param ($NodeName, $Environment, $Tokens)
     
-    Import-DSCResource -Module cIIS
     Import-DSCResource -Module GraniResource
     Import-DSCResource -Module xWebAdministration
 
@@ -65,24 +64,13 @@ Configuration ConfigureIISWebApp {
                 Port = $Tokens.WebServerProvision.WebsitePort
             } 
             PhysicalPath = $Tokens.WebServerProvision.WebsitePhysicalPath
-            State = 'Started' 
+            State = 'Stopped' 
+            AuthenticationInfo = MSFT_xWebAuthenticationInformation {
+                Windows = $true
+                Anonymous = $true
+            }
             DependsOn = @('[cACL]PSCITestWebsiteDirAcl')
-        } 
-        
-
-        cIISWebsiteAuthentication PSCIWebsiteWindowsAuth {
-            WebsiteName =  $Tokens.WebServerProvision.WebsiteName
-            Ensure = 'Present'
-            AuthenticationMethod = 'Windows'
-            DependsOn = @('[xWebsite]PSCIWebsite')
-        }
-
-        cIISWebsiteAuthentication PSCIWebsiteAnonymousAuth {
-            WebsiteName =  $Tokens.WebServerProvision.WebsiteName
-            Ensure = 'Present'
-            AuthenticationMethod = 'Anonymous'
-            DependsOn = @('[xWebsite]PSCIWebsite')
-        }
+        }         
 
     }
 }
