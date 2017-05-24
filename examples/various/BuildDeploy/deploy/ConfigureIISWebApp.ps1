@@ -49,7 +49,7 @@ Configuration ConfigureIISWebApp {
         cACL PSCITestWebsiteDirAcl
         {
             Path = $Tokens.WebServerProvision.WebsitePhysicalPath
-            Account = "IIS AppPool\$($Tokens.WebServerProvision.AppPoolName)"
+            Account = 'Everyone' # don't do that in real life (consider IIS AppPool\YourAppPoolName)
             Ensure  = 'Present'
             Rights  = 'ReadAndExecute'
             Inherit = $true
