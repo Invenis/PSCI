@@ -33,7 +33,8 @@ install:
   - ps: net user $env:PSCIWinRmUser $env:PSCIWinRmPassword /add /y 
   - ps: net localgroup administrators $env:PSCIWinRmUser /add
   - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Set-ExecutionPolicy RemoteSigned -Force; Enable-Remoting
-  - choco install webdeploy -y
+  - choco uninstall webdeploy
+  - choco install webdeploy -y 
 
 build_script:
   - ps: ./build/build.ps1
