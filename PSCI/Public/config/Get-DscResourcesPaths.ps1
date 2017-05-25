@@ -25,7 +25,7 @@ SOFTWARE.
 function Get-DscResourcesPaths {
     <#
     .SYNOPSIS
-    Gets paths to DSC resources (from 'PSCI\dsc' directory.
+    Gets paths to DSC resources (from 'PSCI\dsc' directory).
 
     .PARAMETER ModuleNames
     List of module names to resolve.

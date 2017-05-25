@@ -61,7 +61,7 @@ function Read-ConfigurationFiles {
     }
 
     $invalidLineRegex = '(Import-DSCResource.*`[\s\\r\\n$])'
-    $dscResourceRegex = 'Import-DSCResource\s+(?:-Module)?(?:Name)?\s*([^-][^\s;]+)|Import-DSCResource.+-Module(?:Name)?\s*([^-][^\s;]+)'
+    $dscResourceRegex = 'Import-DSCResource\s+(?:-Module)?(?:Name)?\s*([^-–][^\s;]+)|Import-DSCResource.+-Module(?:Name)?\s*([^-–][^\s;]+)'
     $sqlpsxSsisRegex = 'Deploy-SSISPackage|Import-SQLPSXSSIS'
     $nssmRegex = 'Set-NssmService'
     $builtinStepRegex = '\b(PSCI[\w-]+)\b'
