@@ -37,9 +37,9 @@ For ServerRole examples, see .EXAMPLES section in PSCI\deployment\Configuration\
 Environment Default {
     ServerConnection TestNodeDefault -Nodes { $Tokens.Topology.Nodes }
     ServerConnection TestNodePSRemoting -BasedOn TestNodeDefault -RemotingCredential { $Tokens.Credentials.RemotingCredential }
-    ServerConnection TestNodeMSDeploy -BasedOn TestNodePSRemoting -RemotingMode WebDeployAgentService
+    ServerConnection TestNodeMSDeploy -BasedOn TestNodePSRemoting -RemotingMode WebDeployHandler
 
-    ServerRole Web -Steps @('ConfigureIISProvision', 'ConfigureIISWebApp', 'WebDeployProvision') -ServerConnections TestNodePSRemoting
+    ServerRole Web -Steps @('ConfigureIISProvision', 'ConfigureIISWebApp') -ServerConnections TestNodePSRemoting
     ServerRole Database -Steps @('Deploy-Database') -ServerConnections TestNodeDefault
 
     ServerRole RemotingTestPSRemoting -Steps @('Prepare-RemotingTest', 'Validate-RemotingTest', 'Validate-Website') -RunRemotely -ServerConnections TestNodePSRemoting
