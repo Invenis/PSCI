@@ -13,6 +13,7 @@ environment:
     secure: PkFAZB6f1lwOR9i3Mn9mR+kQBszikFVxmrhtOGK7p/xKlVF8o/htJc9LSQDSi3bN
   PSCIWinRmUser: PSCIUser
   PSCIWinRmPassword: PSCI$Password0X!
+  APPVEYOR_RDP_PASSWORD: RDCPsci$Password0X!
     
 init:
   # Set "build version number" to "short-commit-hash" or when tagged to "tag name"
@@ -64,4 +65,6 @@ after_deploy:
     on:
       branch: master
       appveyor_repo_tag: true
-      
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
