@@ -51,9 +51,7 @@ Task Build -Depends Init, LicenseChecks, RestorePowershellGallery, RestoreNuGetD
     $lines
     
     # Import-Module to check everything's ok
-    $buildDetails = Get-BuildVariables
-    $projectName = Join-Path ($BuildDetails.ProjectPath) (Get-ProjectName)
-    Import-Module -Name $projectName -Force
+    Import-Module -Name $ENV:BHModulePath -Force
 
     if ($ENV:BHBuildSystem -eq 'Teamcity' -or $ENV:BHBuildSystem -eq 'AppVeyor') {
       "Updating module psd1 - FunctionsToExport"
@@ -66,6 +64,9 @@ Task Build -Depends Init, LicenseChecks, RestorePowershellGallery, RestoreNuGetD
       else {
         "Not updating module psd1 version - no env:PackageVersion set"
       }
+      
+      "Removing .Tests. files"
+      Get-ChildItem -Path $ProjectRoot -Include '*.Tests.*ps*1' -Recurse -File | Remove-Item -Force
 
     }
 }
