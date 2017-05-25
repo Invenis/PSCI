@@ -111,7 +111,7 @@ function New-CopySessions {
 
         $needUpdate = $true
         if ($CheckHashMode -eq 'AlwaysCalculateHash') {
-            Invoke-Command -Session $session -ScriptBlock (Convert-FunctionToScriptBlock -FunctionName @('Get-FlatFileList', 'Get-Hash'))
+            Invoke-Command -Session $session -ScriptBlock (Convert-FunctionToScriptBlock -FunctionName @('Get-FlatFileList', 'Get-HashForFiles'))
             $remoteHash = Invoke-Command -Session $session -ScriptBlock {
                 $destinations = $using:Destination
                 foreach ($dest in $destinations) {
@@ -119,7 +119,7 @@ function New-CopySessions {
                         return $null
                     }
                 }
-                Get-Hash -Path $destinations -Include $Include -IncludeRecurse:$IncludeRecurse -Exclude $Exclude -ExcludeRecurse:$ExcludeRecurse
+                Get-HashForFiles -Path $destinations -Include $Include -IncludeRecurse:$IncludeRecurse -Exclude $Exclude -ExcludeRecurse:$ExcludeRecurse
             }
             $needUpdate = $remoteHash -ne $HashPath
         } elseif ($CheckHashMode -eq 'UseHashFile' -and $HashPath) {

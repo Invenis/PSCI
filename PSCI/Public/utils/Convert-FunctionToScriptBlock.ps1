@@ -31,7 +31,7 @@ function Convert-FunctionToScriptBlock {
     Function name.
 
     .EXAMPLE
-    Convert-FunctionToScriptBlock -FunctionName Get-Hash
+    Convert-FunctionToScriptBlock -FunctionName Get-HashForFiles
     #>
   
     [CmdletBinding()]

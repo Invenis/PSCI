@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 #>
 
-function Get-Hash {
+function Get-HashForFiles {
 
     <#
     .SYNOPSIS
@@ -51,7 +51,7 @@ function Get-Hash {
     Algorithm to use.   
 
     .EXAMPLE
-    Get-Hash -Path 'c:\test'
+    Get-HashForFiles -Path 'c:\test'
     
     #>
     [CmdletBinding()]

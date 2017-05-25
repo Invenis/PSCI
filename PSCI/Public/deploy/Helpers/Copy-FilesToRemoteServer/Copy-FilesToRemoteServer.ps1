@@ -156,7 +156,7 @@ function Copy-FilesToRemoteServer {
     # calculate hash for local files if required
     if ($CheckHashMode -ne 'DontCheckHash') {
        Write-Progress -Activity "Checking whether '$Destination' needs updating" -Id 1
-       $hashPath = Get-Hash -Path $Path -Include $Include -IncludeRecurse:$IncludeRecurse -Exclude $Exclude -ExcludeRecurse:$ExcludeRecurse
+       $hashPath = Get-HashForFiles -Path $Path -Include $Include -IncludeRecurse:$IncludeRecurse -Exclude $Exclude -ExcludeRecurse:$ExcludeRecurse
     }
 
     $copySessions = New-CopySessions -ConnectionParams $ConnectionParams `
