@@ -29,7 +29,7 @@ Describe -Tag "PSCI.unit" "Install-DscResources" {
     InModuleScope PSCI {
 
         $Global:loggedMessage = ''
-        $moduleNames = @('cIIS', 'StackExchangeResources', 'xWebAdministration')
+        $moduleNames = @('cIIS', 'rchaganti', 'xWebAdministration')
 
         $Global:writeLogMock = {
             $Global:loggedMessage += $Message

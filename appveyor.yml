@@ -57,7 +57,6 @@ after_build:
 deploy:
   - provider: GitHub
     auth_token: $(GithubAuthToken)
-    artifact: /.*\.zip/
     draft: true
     prerelease: false
     on:

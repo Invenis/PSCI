@@ -102,6 +102,9 @@ Task RestoreNuGetDsc {
         "$dscPath\packages.config" `
         -ConfigFile "$dscPath\nuget.config" `
         -OutputDirectory "$dscPath"
+        
+    "Removing dsc examples"
+    Get-ChildItem -Path "$ProjectRoot\dsc\ext" -Include @('Example', 'Examples', 'Tests', 'Documentation_files', 'Samples') -Directory -Recurse | Remove-Item -Force -Recurse
 }
 
 Task RestorePowershellGallery {

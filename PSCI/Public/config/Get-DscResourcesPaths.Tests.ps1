@@ -39,8 +39,8 @@ Describe -Tag "PSCI.unit" "Get-DscResourcesPaths" {
 
         Context "when supplied with some ModuleNames" {
 
-            $moduleNames = @('xWebAdministration', 'cIIS', 'StackExchangeResources') | Sort
-            $moduleNamesWildcard = @('xWebAdministration.*', 'cIIS', 'StackExchangeResources') | Sort
+            $moduleNames = @('xWebAdministration', 'cIIS', 'rchaganti') | Sort
+            $moduleNamesWildcard = @('xWebAdministration.*', 'cIIS', 'rchaganti') | Sort
             $result = Get-DscResourcesPaths -ModuleNames $moduleNames
 
             It "should return proper paths" {
