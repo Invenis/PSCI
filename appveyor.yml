@@ -4,6 +4,10 @@ skip_commits:
 
 image: Visual Studio 2017
 
+services:
+  - iis
+  - mssql2014rs
+
 environment:
   NugetApiKey:
     secure: DIE2y66RzXWvp2Q0wIOLlBTjxILBGeHyyg3pjwWjdVrggzuj9BuMWCdfHFmt9nt2
