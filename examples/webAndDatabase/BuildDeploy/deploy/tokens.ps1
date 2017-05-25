@@ -59,7 +59,7 @@ Environment Default {
     # Tokens related to database deployment
     Tokens DatabaseConfig @{
         DatabaseName = 'PSCITest'
-        ConnectionString = 'Server=(local)\SQL2012SP1;Database=master;User ID=sa;Password=Password12!'
+        ConnectionString = 'Server=(local)\SQL2014;Database=master;User ID=sa;Password=Password12!'
         DropDatabase = $true
     }
 }

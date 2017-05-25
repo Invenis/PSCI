@@ -64,7 +64,7 @@ Configuration ConfigureIISWebApp {
                 Port = $Tokens.WebServerProvision.WebsitePort
             } 
             PhysicalPath = $Tokens.WebServerProvision.WebsitePhysicalPath
-            State = 'Stopped' 
+            State = 'Started' 
             AuthenticationInfo = MSFT_xWebAuthenticationInformation {
                 Windows = $true
                 Anonymous = $true

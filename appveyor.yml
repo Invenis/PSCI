@@ -33,6 +33,7 @@ install:
   - ps: net user $env:PSCIWinRmUser $env:PSCIWinRmPassword /add /y 
   - ps: net localgroup administrators $env:PSCIWinRmUser /add
   - ps: . ./PSCI/bat/PSRemoting/Enable-Remoting.ps1; Set-ExecutionPolicy RemoteSigned -Force; Enable-Remoting
+  - choco install webdeploy -y
 
 build_script:
   - ps: ./build/build.ps1
@@ -44,9 +45,9 @@ artifacts:
 after_build:
   - ps: . ./examples/various/BuildDeploy/build.ps1
   - ps: . ./examples/webAndDatabase/BuildDeploy/build.ps1
-  - ps: . ./examples/various/bin/DeployScripts/deploy.ps1 -Environment Dev -TokensOverride @{ 'Credentials.UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; 'Topology.Nodes' = 'localhost' }
-  - ps: . ./examples/webAndDatabase/bin/DeployScripts/deploy.ps1 -Environment Test -TokensOverride @{ 'UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
-  - ps: . ./examples/builtinSteps/BuildDeploy/deploy.ps1 -Environment Test -TokensOverride @{ 'UserName' = $env:PSCIWinRmUser; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
+  - ps: . ./examples/various/bin/DeployScripts/deploy.ps1 -Environment Dev -TokensOverride @{ 'Credentials.UserName' = "$($env:COMPUTERNAME)\$($env:PSCIWinRmUser)"; Password = $env:PSCIWinRmPassword; 'Topology.Nodes' = 'localhost' }
+  - ps: . ./examples/webAndDatabase/bin/DeployScripts/deploy.ps1 -Environment Test -TokensOverride @{ 'UserName' = "$($env:COMPUTERNAME)\$($env:PSCIWinRmUser)"; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
+  - ps: . ./examples/builtinSteps/BuildDeploy/deploy.ps1 -Environment Test -TokensOverride @{ 'UserName' = "$($env:COMPUTERNAME)\$($env:PSCIWinRmUser)"; Password = $env:PSCIWinRmPassword; Nodes = 'localhost' }
     
 deploy:
   - provider: GitHub

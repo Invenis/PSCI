@@ -36,7 +36,7 @@ Environment Default {
 
     Tokens DatabaseConfig @{
         DatabaseName = 'PSCITest'
-        DatabaseDeploymentConnectionString = 'Server=${Node}\SQLEXPRESS;Integrated Security=SSPI;'
+        DatabaseDeploymentConnectionString = 'Server=(local)\SQL2014;Database=master;User ID=sa;Password=Password12!;'
     }
 
     Tokens WebsitePortCategory @{
