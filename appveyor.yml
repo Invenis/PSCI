@@ -40,6 +40,8 @@ install:
 
 build_script:
   - ps: ./build/build.ps1
+
+test: off
   
 artifacts:
   - path: PSCI

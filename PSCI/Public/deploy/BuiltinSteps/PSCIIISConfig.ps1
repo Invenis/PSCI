@@ -111,9 +111,10 @@ Configuration PSCIIISConfig {
 
     #>
 
-    Import-DSCResource -Module cIIS
-    Import-DSCResource -Module cACL
-    Import-DSCResource -Module cCertificate
+    Import-DSCResource -ModuleName cIIS
+    Import-DSCResource -ModuleName cACL
+    Import-DSCResource -ModuleName cCertificate
+    Import-DscResource –ModuleName PSDesiredStateConfiguration
 
     Node $AllNodes.NodeName {
 

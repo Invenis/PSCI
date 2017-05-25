@@ -81,7 +81,8 @@ configuration PSCIWindowsFeature {
     Install specified roles manually running DSC configuration.
     #>
 
-    Import-DSCResource -Module xDismFeature
+    Import-DSCResource -ModuleName xDismFeature
+    Import-DscResource –ModuleName PSDesiredStateConfiguration
 
     Node $AllNodes.NodeName {        
         $isClientWindows = Get-TokenValue -Name 'IsClientWindows'
