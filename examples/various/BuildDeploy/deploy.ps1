@@ -123,35 +123,53 @@ try {
     ############# Initialization
     Push-Location -Path $PSScriptRoot
 
-    if (![System.IO.Path]::IsPathRooted($PSCILibraryPath)) {
-        $PSCILibraryPath = Join-Path -Path $ProjectRootPath -ChildPath $PSCILibraryPath
-    }
-    if (!(Test-Path -LiteralPath "$PSCILibraryPath\PSCI.psd1")) {
-        if (Test-Path -LiteralPath "$PSScriptRoot\packages\PSCI\PSCI.psd1") {
-            Write-Host -Object "PSCI library found at '$PSScriptRoot\packages\PSCI'."
-        } else {
-            Write-Host -Object "Cannot find PSCI library at '$PSCILibraryPath' (current dir: '$PSScriptRoot') - downloading nuget.exe."
-            Invoke-WebRequest -Uri 'http://nuget.org/nuget.exe' -OutFile "$env:TEMP\NuGet.exe"
-            if (!(Test-Path "$env:TEMP\NuGet.exe")) {
-                Write-Host -Object "Failed to download nuget.exe to '$env:TEMP'. Please download PSCI manually and set PSCILibraryPath parameter to an existing path."
-                exit 1
-            }
-            Write-Host -Object 'Nuget.exe downloaded successfully - installing PSCI.'
-
-            & "$env:TEMP\NuGet.exe" install PSCI -ExcludeVersion -OutputDirectory "$PSScriptRoot\packages"
-            $PSCILibraryPath = "$PSScriptRoot\packages\PSCI"
-
-            if (!(Test-Path -LiteralPath "$PSCILibraryPath\PSCI.psd1")) {
-                Write-Host -Object "Cannot find PSCI library at '$PSCILibraryPath' (current dir: '$PSScriptRoot'). PSCI was not properly installed as nuget."
-                exit 1
-            }
+    $PSCIResolvedPath = ''
+    if ($PSCILibraryPath) { 
+        if (![System.IO.Path]::IsPathRooted($PSCILibraryPath)) {
+            $PSCILibraryPath = Join-Path -Path $ProjectRootPath -ChildPath $PSCILibraryPath
         }
-        $PSCILibraryPath = "$PSScriptRoot\packages\PSCI"
-    } else {
-        $PSCILibraryPath = (Resolve-Path -Path $PSCILibraryPath).ProviderPath
-        Write-Host -Object "PSCI library found at '$PSCILibraryPath'."
+        if (Test-Path -LiteralPath "$PSCILibraryPath\PSCI.psd1") {
+            $PSCIResolvedPath = "$PSCILibraryPath\PSCI.psd1"
+        } else {
+            Write-Host -Object "Cannot find PSCI library at '$PSCILibraryPath' (current dir: '$PSScriptRoot')."
+     
+        }
     }
-    Import-Module "$PSCILibraryPath\PSCI.psd1" -Force
+
+    if (!$PSCIResolvedPath -and (Test-Path -LiteralPath "$PSScriptRoot\packages\PSCI")) {
+        $PSCIResolvedPath = Get-ChildItem -Path "$PSScriptRoot\packages\PSCI" -Include 'PSCI.psd1' -File -Recurse -Depth 2 | Select-Object -ExpandProperty FullName -First 1
+    }
+
+    if (!$PSCIResolvedPath) {
+        if ((Get-Module -Name PSCI -ListAvailable)) {
+            Write-Host -Object "PSCI found installed as global module - importing."
+            Import-Module -Name PSCI
+            $PSCIResolvedPath = ''
+        } else {
+            Write-Host -Object "Downloading PSCI from Powershell Gallery."
+            if (!(Get-PackageProvider | Where-Object { $_.Name -eq 'NuGet' })) {
+                Install-PackageProvider -Name NuGet -force | Out-Null
+            }
+            Import-PackageProvider -Name NuGet -force | Out-Null
+            if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
+                Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            }
+            [void](New-Item -Path "$PSScriptRoot\packages" -ItemType Directory -ErrorAction SilentlyContinue)
+            Save-Module -Name 'PSCI' -LiteralPath "$PSScriptRoot\packages"
+            $PSCIResolvedPath = Get-ChildItem -Path "$PSScriptRoot\packages\PSCI" -Include 'PSCI.psd1' -File -Recurse -Depth 2 | Select-Object -ExpandProperty FullName -First 1
+        }
+    }
+
+    if ($PSCIResolvedPath) {
+        $PSCIResolvedPath = (Resolve-Path -Path $PSCIResolvedPath).ProviderPath
+        Write-Host -Object "PSCI library found at '$PSCIResolvedPath'."
+        Import-Module -Name $PSCIResolvedPath -Force 
+    }
+
+    if (!(Get-Module -Name PSCI)) {
+        Write-Host "Failed to find PSCI library and get it from Powershell Gallery. Please try changing `$PSCILibraryPath variable."
+        exit 1 
+    }
 
     $PSCIGlobalConfiguration.LogFile = "$PSScriptRoot\deploy.log.txt"
     Remove-Item -LiteralPath $PSCIGlobalConfiguration.LogFile -ErrorAction SilentlyContinue
