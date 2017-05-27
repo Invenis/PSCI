@@ -21,7 +21,7 @@ PSCI provides following features:
 - Supports several methods of tokenizing configuration files (e.g. Web.config) - directly replace tokens in files (using regex), transform using XDT (Web.\<env_name\>.config) or use Web Deploy parameterization.
 - Supports Windows Server 2008 R2 SP1 / 7 and above (some available DSC resources like xWebsite have been fixed to work with pre-Server 2012).
 
-Additionally, [PSCI.teamcityExtensions](https://github.com/ObjectivityBSS/PSCI.teamcityExtensions/wiki) provides a set of TeamCity metarunners that make use of PSCI functions.
+Additionally, [Objectivity.TeamcityMetarunners](https://github.com/ObjectivityLtd/Objectivity.TeamcityMetarunners) provides a set of TeamCity metarunners that make use of PSCI functions.
 
 #### Why PSCI?
 
@@ -30,5 +30,5 @@ See [Why PSCI](https://github.com/ObjectivityBSS/PSCI/wiki/Why%20PSCI).
 #### Where to start?
 -------------
 - See [Getting started](https://github.com/ObjectivityBSS/PSCI/wiki/Getting-started).
-- Checkout the code or get it from [nuget](https://www.nuget.org/packages/PSCI/) and use [Powershell Tools for Visual Studio 2015](https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597) or [PsISEProjectExplorer](https://github.com/mgr32/PsISEProjectExplorer) to explore.
+- Checkout the code or get it from [Powershell Gallery](https://www.powershellgallery.com/packages/PSCI) or [nuget](https://www.nuget.org/packages/PSCI/) and use [Powershell Tools for Visual Studio 2015](https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597) or [PsISEProjectExplorer](https://github.com/mgr32/PsISEProjectExplorer) to explore.
 
