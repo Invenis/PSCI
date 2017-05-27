@@ -115,8 +115,8 @@ Configuration cTeamCityAgent {
             Name                  = "TeamCity Agent"
             DisplayName           = "TeamCity Agent"
             Ensure                = "Present"
-            Access                = "Allow"
-            State                 = "Enabled"
+            Action                = "Allow"
+            Enabled               = "True"
             Profile               = ("Domain")
             Direction             = "Inbound"
             LocalPort             = $AgentPort
