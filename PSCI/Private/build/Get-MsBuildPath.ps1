@@ -69,13 +69,13 @@ function Get-MsBuildPath {
             {"2010" -or "2012"} { $MsBuildVersion = "4.0" }
             "2013"              { $MsBuildVersion = "12.0" }
             "2015"              { $MsBuildVersion = "14.0" }
-             "2017"              { $MsBuildVersion = "15.0" }
+            "2017"              { $MsBuildVersion = "15.0" }
             default             { throw "Unrecognized VisualStudioVersion: $VisualStudioVersion" }
         }
     }
 
     if (!$MsBuildVersion) {
-        $versions = @("14.0", "12.0", "4.0", "3.5", "2.0")
+        $versions = @("15.0", "14.0", "12.0", "4.0", "3.5", "2.0")
     } else {
         $versions = @($MsBuildVersion)
     }
