@@ -54,7 +54,7 @@ function Get-MsBuildPath {
 
         [Parameter(Mandatory=$false)]
         [string] 
-        [ValidateSet("14.0","12.0","4.0","3.5","2.0","")]
+        [ValidateSet("15.0","14.0","12.0","4.0","3.5","2.0","")]
         $MsBuildVersion,
 
         [Parameter(Mandatory=$false)]
@@ -69,6 +69,7 @@ function Get-MsBuildPath {
             {"2010" -or "2012"} { $MsBuildVersion = "4.0" }
             "2013"              { $MsBuildVersion = "12.0" }
             "2015"              { $MsBuildVersion = "14.0" }
+             "2017"              { $MsBuildVersion = "15.0" }
             default             { throw "Unrecognized VisualStudioVersion: $VisualStudioVersion" }
         }
     }
@@ -81,8 +82,25 @@ function Get-MsBuildPath {
 
     foreach ($version in $versions) 
     {
-        $toolsRegKey = "HKLM:\Software\Microsoft\MSBuild\ToolsVersions\$version"
-        $msBuildToolsPath = Get-ItemProperty -Path $toolsRegKey -Name "MSBuildToolsPath" -ErrorAction SilentlyContinue
+        if ($version -eq "15.0") {
+            
+            $configPaths = Get-ConfigurationPaths
+            $nugetPackagesPath = $configPaths.DeployScriptsPath + '\packages'
+            
+            Install-NugetPackage -PackageId vswhere -OutputDirectory $nugetPackagesPath -ExcludeVersionInOutput
+            $path = & "$nugetPackagesPath\vswhere\tools\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+           
+            if ($path) {
+                $path = join-path $path 'MSBuild\15.0\Bin\'
+            }
+
+            $msBuildToolsPath = @{ MSBuildToolsPath = $path }
+        }
+        else {
+            $toolsRegKey = "HKLM:\Software\Microsoft\MSBuild\ToolsVersions\$version"
+            $msBuildToolsPath = Get-ItemProperty -Path $toolsRegKey -Name "MSBuildToolsPath" -ErrorAction SilentlyContinue
+        }
+
         if ($msBuildToolsPath -and $msBuildToolsPath.MSBuildToolsPath) {
             $msBuildPath = Join-Path -Path $msBuildToolsPath.MSBuildToolsPath -ChildPath "msbuild.exe"
             # TODO: this doesn't seem right!
