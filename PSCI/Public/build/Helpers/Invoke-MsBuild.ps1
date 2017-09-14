@@ -78,7 +78,7 @@ function Invoke-MsBuild {
         $LogExternalMessage = $true
     )
 
-    if ($LogExternalMessage) { 
+    if ($LogExternalMessage) {
         $projectFile = Split-Path -Path $ProjectPath -Leaf
         Write-ProgressExternal -Message "Running msbuild - $projectFile" -ErrorMessage 'Msbuild error'
     }
@@ -102,7 +102,7 @@ function Invoke-MsBuild {
         }
         if (!$AssemblyInfoFilePaths) {
             Write-Log -Warn "No AssemblyInfo files found"
-        } else { 
+        } else {
             Set-AssemblyVersion -Path $AssemblyInfoFilePaths -Version $Version -VersionAttribute AssemblyVersion,AssemblyFileVersion -CreateBackup
         }
     }
@@ -111,7 +111,7 @@ function Invoke-MsBuild {
         Write-Log -Info "Restoring nuget packages for project '$ProjectPath'." -Emphasize
         Start-NugetRestore -ProjectPath $ProjectPath
     }
-         
+
     $Targets = $MsBuildOptions.Targets
     $Configuration = $MsBuildOptions.Configuration
     $MsBuildProperties = $MsBuildOptions.MsBuildProperties
@@ -153,8 +153,8 @@ function Invoke-MsBuild {
             "2010" = "10.0"; `
             "2012" = "11.0"; `
             "2013" = "12.0"; `
-			"2015" = "14.0"; `
-			"2017" = "15.0"
+            "2015" = "14.0"; `
+            "2017" = "15.0"
         }
         $vsVersion = $vsVersionMap[$VisualStudioVersion]
         $cmd += " /p:VisualStudioVersion=`"${vsVersion}`""
@@ -176,14 +176,14 @@ function Invoke-MsBuild {
 
     # note: don't put [void] / Out-Null here as we need to write output
     Invoke-ExternalCommand -Command $cmd -DontCatchOutputStreams -ReturnLastExitCode:$false
-    
+
     if ($Version) {
         Restore-AssemblyVersionBackups -Path $AssemblyInfoFilePaths
     }
 
-    if ($LogExternalMessage) { 
+    if ($LogExternalMessage) {
         Write-ProgressExternal -Message '' -ErrorMessage ''
     }
 
-    
+
 }
