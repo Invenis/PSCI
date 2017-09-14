@@ -35,7 +35,7 @@ For ServerRole examples, see .EXAMPLES section in PSCI\deployment\Configuration\
 
 # Default environment, parent for all others
 Environment Default {
-    ServerConnection TestNode -Nodes localhost
+    ServerConnection TestNode -Nodes localhost -RemotingCredential { $Tokens.Credentials.RemotingCredential }
 
     # There are two steps - 'PSCIWindowsFeature' which is defined implictly and uses $Tokens.WindowsFeaturesTestRole by convention and
     # 'Custom-WindowsFeaturesStep' which invokes custom scriptblock that invokes PSCIWindowsFeature with $Tokens.CustomWindowsFeatures
@@ -45,7 +45,7 @@ Environment Default {
 
     ServerRole IISConfigTestRole -Steps 'PSCIIISConfig' -ServerConnections TestNode
 
-    Step Custom-WindowsFeaturesStep -ScriptBlock { PSCIWindowsFeature -Tokens $Tokens.CustomWindowsFeatures }
+    Step Custom-WindowsFeaturesStep -ScriptBlock { PSCIWindowsFeature }
 }
 
 Environment Test {

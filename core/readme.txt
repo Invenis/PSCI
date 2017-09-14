@@ -1,1 +1,0 @@
-This module contains common utility functions. They are always available, both in local and remote runs.

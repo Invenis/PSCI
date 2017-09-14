@@ -59,7 +59,7 @@ Environment Default {
     # Tokens related to database deployment
     Tokens DatabaseConfig @{
         DatabaseName = 'PSCITest'
-        ConnectionString = 'Server=localhost\SQLEXPRESS;Database=${DatabaseName};Integrated Security=SSPI'
+        ConnectionString = 'Server=(local)\SQL2014;Database=master;User ID=sa;Password=Password12!'
         DropDatabase = $true
     }
 }

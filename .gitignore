@@ -1,4 +1,5 @@
 bin/
+PSCI/baseModules/
 build.log.txt
 deploy.log.txt
 deploy_*.txt
@@ -12,3 +13,5 @@ StyleCop.cache
 *.nupkg
 .vs/
 /PSCI.pssproj.user
+PSCI/dsc/ext/PSGallery/*/
+PSCI/dsc/ext/Grani/*/
