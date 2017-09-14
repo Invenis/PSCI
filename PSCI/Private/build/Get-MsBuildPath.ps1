@@ -49,7 +49,7 @@ function Get-MsBuildPath {
     param(
         [Parameter(Mandatory=$false)]
         [string] 
-        [ValidateSet("2015","2013","2012","2010","2008", "")]
+        [ValidateSet("2017", "2015","2013","2012","2010","2008", "")]
         $VisualStudioVersion,
 
         [Parameter(Mandatory=$false)]
